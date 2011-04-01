@@ -1,0 +1,183 @@
+<html>
+<title>Turing Machine Simulator</title>
+<script>
+
+/* internal values for simulated computer */
+var ins_pointer = 0;
+var ram = new Array();
+
+/* objects that display data to the user */
+var disp_code;
+var disp_ram;
+var disp_ins_pointer;
+
+/* only allow turing machine chars in source box - all others ignored */
+function char_check(e)
+{
+	e.value = e.value.replace( /9/g , '' );
+/* only allowed chars in input
+><+-.,[]
+*/
+}
+
+/*
+	rewind code to beginning reset all memory locations
+	this simulates rebooting the computer
+*/
+function rewind()
+{
+	update_ins_pointer(0);
+	reset_ram();
+}
+
+/* step forward one instruction */
+function step_next()
+{
+	update_ins_pointer(1);
+}
+
+function step_back()
+{
+	update_ins_pointer(-1);
+}
+
+/* update instruction pointer
+	direction:
+	
+	1 inrement pointer by one
+	0 set pointer to 0
+	-1 decrement pointer by one
+*/
+function update_ins_pointer(direction)
+{
+		if(direction < 0 && ins_pointer != 0 ) { ins_pointer--; }
+		else if (direction == 0 ) { ins_pointer = 0; }
+		else { ins_pointer++; }
+		disp_ins_pointer.value =  ins_pointer;
+}
+
+function init_form()
+{
+	disp_code  = document.getElementById("code");
+	disp_ins_pointer = document.getElementById("ins_pointer_disp");
+	disp_ram = document.getElementById("ram_disp");
+	setup_ram();
+	reset_ram();
+	/* reset_output(); */
+	print_ram();
+}
+
+/* reset all RAM to 0 */
+function reset_ram()
+{
+	var i;
+	for(i=0; i < 32; i++) { ram[i] = 0; }
+}
+
+/* display current contents of RAM on screen */
+function print_ram()
+{
+	var i;
+	for(i=0; i < 32; i++){
+		//disp_ram.innerHTML += i + "&nbsp;&nbsp;&nbsp;&nbsp;"+ram[i] + "<br>";
+	}
+}
+
+function setup_ram()
+{
+	var i;
+	disp_ram.innerHTML += "<table>";
+	for(i=0; i < 32; i++){
+		disp_ram.innerHTML += "<tr><td>"+i+"</td></tr>";
+	}
+	disp_ram.innerHTML += "</table>";
+}
+
+</script>
+
+<style type="text/css">
+
+#input_banner {
+	position: absolute;
+	top: 120px;
+	left: 110px;
+}
+
+#output_banner {
+	position: absolute;
+	top: 120px;
+	left: 565px;
+}
+
+#memory_banner {
+	position: absolute;
+	top: 120px;
+	left: 355px;
+}
+
+#input {
+	position: absolute;
+	top: 140px;
+	left: 10px;
+}	
+
+#ram_disp {
+	position: absolute;
+	top: 140px;
+	left: 315px;
+}
+
+#output {
+	position: absolute;
+	top: 140px;
+	left: 495px;
+}
+
+</style>
+<body onLoad="init_form();">
+
+<center><h2>Turing Machine Simulator</h2></center>
+
+<center>
+<button name="step" onClick='rewind();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png"></button>
+<button name="step" onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png"></button>
+<button name="step" onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png"></button>
+<button name="step" disabled><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
+<button name="step" onClick='rewind();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
+<button name="step" disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
+</center>
+
+<div id="input_banner">INPUT</div>
+
+<div id="input">
+<textarea id="code" rows="15" cols="33" onKeyDown="char_check(this);"></textarea>
+</div>
+Instruction Pointer: <input id="ins_pointer_disp" type="text" diabled value=0>
+<div id="memory_banner">MEMORY</div>
+<div id="ram_disp"></div>
+<!--<table>
+	<tr><td>0</td><td>0</td></tr>
+	<tr><td>1</td><td>0</td></tr>
+	<tr><td>2</td><td>0</td></tr>
+	<tr><td>3</td><td>0</td></tr>
+	<tr><td>4</td><td>0</td></tr>
+	<tr><td>5</td><td>0</td></tr>
+	<tr><td>6</td><td>0</td></tr>
+	<tr><td>7</td><td>0</td></tr>
+	<tr><td>8</td><td>0</td></tr>
+	<tr><td>9</td><td>0</td></tr>
+</table>
+
+<textarea name=code  rows="15" cols="20" disabled >
+</textarea>
+
+-->
+
+<div id="output_banner">OUTPUT</div>
+<div id="output">
+<textarea name=code  rows="15" cols="30" disabled ></textarea>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,317 @@
+<html>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+////////////////////////////////////////
+////////////////////////////////////////
+// F Permadi 10/10/01
+// Copyright 2001 F. Permadi 
+////////////////////////////////////////
+////////////////////////////////////////
+var timerId;
+
+////////////////////////////////////////
+// clear timer
+////////////////////////////////////////
+function clearAuto()
+{
+	clearTimeout(timerId);
+}
+
+////////////////////////////////////////
+// convert decimal to hexadecimal number
+////////////////////////////////////////
+function binToDec(setTimer)
+{
+	var binNum=document.form1.bin.value;
+	var decNum=decConvertFromBase(binNum, 2);
+	if (binNum!="-1")
+	{
+		document.form1.dec.value=decNum;
+		if (setTimer==true)
+		{	
+			timerId=setTimeout("binToDec(true)", 100);
+		}
+		return true;
+	}
+	else
+	{
+		document.form1.bin.value="";
+		return false;
+	}
+}   
+
+////////////////////////////////////////
+// convert hexadecimal to decimal number
+////////////////////////////////////////
+function hexToDec(setTimer)
+{
+	var hexNum=document.form1.hex.value;
+	var decNum=decConvertFromBase(hexNum, 16);
+	if (decNum!="-1")
+	{
+		document.form1.dec.value=decNum;
+		if (setTimer==true)
+		{	
+			timerId=setTimeout("hexToDec(true)", 100);
+		}
+		return true;
+	}
+	else
+	{
+		document.form1.dec.value="";
+		return false;
+	}
+}
+
+////////////////////////////////////////
+// process decimal conversion
+////////////////////////////////////////
+function hexProcess(setTimer)
+{
+	var hexNum=""+document.form1.hex.value;
+
+	// make sure the number is valid
+	for (i=0; i<hexNum.length; i++)
+	{
+		if ((hexNum.charAt(i)>='0' && hexNum.charAt(i)<='9') ||
+			(hexNum.charAt(i)>='a' && hexNum.charAt(i)<='f') ||
+			(hexNum.charAt(i)>='A' && hexNum.charAt(i)<='F'))
+		{
+		}
+		else
+		{
+			alert(hexNum+" is not a valid HEXADECIMAL number because it contains "+hexNum.charAt(i));
+			document.form1.hex.value="";
+			return false;
+		}
+	}
+	hexToDec();
+	decToBin();
+	if (setTimer==true)
+	{	
+		timerId=setTimeout("hexProcess(true)", 100);
+	}
+}
+
+////////////////////////////////////////
+// process decimal conversion
+////////////////////////////////////////
+function decProcess(setTimer)
+{
+	var num=document.form1.dec.value;
+	// make sure the number is valid
+	for (i=0; i<num.length; i++)
+	{
+		if (num.charAt(i)>='0' && num.charAt(i)<='9')
+		{
+		}
+		else
+		{
+			alert(num+" is not a valid DECIMAL number because it contains\n \""+num.charAt(i)+"\"");
+			document.form1.dec.value="";			
+			return false;
+		}
+	}
+	decToBin(false);
+	decToHex(false);
+	if (setTimer==true)
+	{	
+		timerId=setTimeout("decProcess(true)", 100);
+	}
+	return true;
+}
+
+////////////////////////////////////////
+// process binary conversion
+////////////////////////////////////////
+function binProcess(setTimer)
+{
+	var num=document.form1.bin.value;
+	// make sure the number is valid
+	for (i=0; i<num.length; i++)
+	{
+		if (num.charAt(i)>='0' && num.charAt(i)<='1')
+		{
+		}
+		else
+		{
+			alert(num+" is not a valid BINARY number because it contains\n \""+num.charAt(i)+"\"");
+			document.form1.bin.value="";			
+			return false;
+		}
+	}
+	binToDec(false);
+	decToHex(false);
+	if (setTimer==true)
+	{	
+		timerId=setTimeout("binProcess(true)", 100);
+	}
+	return true;
+}
+
+
+////////////////////////////////////////
+// convert decimal to hexadecimal number
+////////////////////////////////////////
+function decToBin(setTimer)
+{
+	var decNum=document.form1.dec.value;
+	var binNum=decConvertToBase(decNum, 2);
+	if (binNum!="-1")
+	{
+		document.form1.bin.value=binNum;
+		if (setTimer==true)
+		{	
+			timerId=setTimeout("decToBin(true)", 100);
+		}
+		return true;
+	}
+	else
+	{
+		document.form1.bin.value="";
+		return false;
+	}
+}   
+
+////////////////////////////////////////
+// convert decimal to hexadecimal number
+////////////////////////////////////////
+function decToHex(setTimer)
+{
+	var decNum=document.form1.dec.value;
+	var hexNum=decConvertToBase(decNum, 16);
+	if (hexNum!="-1")
+	{
+		document.form1.hex.value=hexNum;
+		if (setTimer==true)
+		{	
+			timerId=setTimeout("decToHex(true)", 100);
+		}
+		return true;
+	}
+	else
+	{
+		document.form1.hex.value="";
+		return false;
+	}
+	return true;
+}   
+
+////////////////////////////////////////
+// convert non decimal number to decimal
+////////////////////////////////////////
+function decConvertFromBase(num, base)
+{
+	var decNum=0;
+	var power=0;
+	// loop backward
+	for (i=num.length-1; i>=0; i--)
+	{
+		var digit=num.charAt(i);
+		if (digit>='a' || digit>='A')
+		{
+			if (digit=='a' || digit=='A')
+				digit=10;
+			else if (digit=='b' || digit=='B')
+				digit=11;
+			else if (digit=='c' || digit=='C')
+				digit=12;
+			else if (digit=='d' || digit=='D')
+				digit=13;
+			else if (digit=='e' || digit=='E')
+				digit=14;
+			else if (digit=='f' || digit=='F')
+				digit=15;
+		}
+		decNum+=digit*Math.pow(base, power);
+		power++;
+	}
+	return decNum;
+}
+
+
+////////////////////////////////////////
+// convert decimal number to non decimal
+////////////////////////////////////////
+function decConvertToBase(num, base)
+{
+	var newNum="";
+	var result=num;
+	var remainder=0;
+	while (result>0)
+	{
+		result=Math.floor(num/base);
+		remainder=num%base;
+		num=result;
+		
+		if (remainder>=10)
+		{
+			if (remainder==10)
+				remainder='A';
+			if (remainder==11)
+				remainder='B';
+			if (remainder==12)
+				remainder='C';
+			if (remainder==13)
+				remainder='D';
+			if (remainder==14)
+				remainder='E';
+			if (remainder==15)
+				remainder='F';
+		}
+		// just append the next remainder to the beginning of the string
+		newNum=""+remainder+newNum;
+	};
+	return newNum;
+}
+
+////////////////////////////////////////
+// increase decimal val and recalc others
+////////////////////////////////////////
+function incDecNumber()
+{
+	if(document.form1.dec.value >= 0) {
+		document.form1.dec.value++;
+		document.form1.hex.value = decConvertToBase(document.form1.dec.value, 16);
+		document.form1.bin.value = decConvertToBase(document.form1.dec.value, 2);
+	}
+	
+}
+
+////////////////////////////////////////
+// decrease decimal val and recalc others
+////////////////////////////////////////
+function decDecNumber()
+{
+	if(document.form1.dec.value > 0) {
+		document.form1.dec.value--;
+		document.form1.hex.value = decConvertToBase(document.form1.dec.value, 16);
+		document.form1.bin.value = decConvertToBase(document.form1.dec.value, 2);
+	}
+}
+
+function clearAll()
+{
+	document.form1.dec.value = '';
+	document.form1.hex.value = '';
+	document.form1.bin.value = '';
+}
+
+//-->
+   </SCRIPT>
+	<b>Number Conversion Applet</b><br>
+<form name="form1">
+	<table>
+	<tr>
+		<td>Decimal:</td><td><INPUT TYPE="text" NAME="dec" SIZE="20" onBlur="javascript:clearAuto()" onFocus="javascript:decProcess(true)" onChange="javascript:clearAuto()" style="text-align:right;"></td>
+	</tr><tr>
+		<td>Binary:</td><td><INPUT TYPE="text" NAME="bin" SIZE="20" onBlur="javascript:clearAuto()" onFocus="javascript:binProcess(true)" onChange="javascript:clearAuto()" style="text-align:right;"></td>
+	</tr><tr>
+		<td>Hex:</td><td><INPUT TYPE="text" NAME="hex" SIZE="20" onBlur="javascript:clearAuto()" onFocus="javascript:hexProcess(true)" onChange="javascript:clearAuto()" style="text-align:right;"></td>
+	</tr>
+	</table>
+</form>
+	<button onClick='incDecNumber();'>+</button>
+	<button onClick='decDecNumber();'>-</button>
+	<button onClick='clearAll();'>Clear</button>
+</html>
