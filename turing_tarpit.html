@@ -4,6 +4,8 @@
 
 /* internal values for simulated computer */
 var ins_pointer = 0; /* instruction pointer */
+var dat_pointer = 0; /* data pointer */
+var dat_pointer_last_address = 0; /* address of data pointer in last step */
 var ram_last_address = 0; /* address of RAM updated in last step */
 var ram = new Array();
 
@@ -19,6 +21,43 @@ function char_check(e)
 	/* only allowed chars in input ><+-.,[] */
 }
 
+/* execute next instruction from input */
+function exe_nxt_inst()
+{
+	var code = document.getElementById("code");
+	var ins = null; /* current instruction from code */
+	if(ins_pointer > code.value.length) {
+		alert("HALT: Program is Complete");
+		reset();
+	}
+
+	ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
+
+	switch(ins)
+	{
+		case '+':
+			ram_modify(ins_pointer, 1);
+  			break;
+		case '-':
+			ram_modify(ins_pointer, -1);
+  			break;
+		case '>':
+			dat_point_modify(1);
+			break;
+		case '<':
+			dat_point_modify(-1);
+			break;
+		default:
+  			/* must be a comment :) */
+	}
+
+	/*
+	alert(document.getElementById("code").value.length);
+	alert(document.getElementById("code").value);
+	alert(document.getElementById("code").value.substring(0,1));
+	*/
+}
+
 /*
 	rewind code to beginning reset all memory locations
 	this simulates rebooting the computer
@@ -26,21 +65,25 @@ function char_check(e)
 function reset()
 {
 	update_ins_pointer(0);
+	dat_point_modify(0);
 	ram_reset();
 	ram_highlight_clear();
+	dat_point_highlight();
 }
 
 /* step forward one instruction */
 function step_next()
 {
-	
 	update_ins_pointer(1);
+	exe_nxt_inst();
+	dat_point_highlight();
 }
 
 /* more back one instruction - undoes work of previous instruction */
 function step_back()
 {
 	update_ins_pointer(-1);
+	dat_point_highlight();
 }
 
 /* update instruction pointer
@@ -127,7 +170,6 @@ function ram_init()
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
-	alert(disp_ram.innerHTML);
 }
 
 /* modify the value at this address - reset RAM highlights for all addresses
@@ -155,6 +197,34 @@ function ram_modify(address, change)
 	ram_last_address = address;
 }
 
+/* modify state of data pointer */
+function dat_point_modify(change)
+{
+	dat_pointer_last_address = dat_pointer;
+	if (change > 0 ) {
+		dat_pointer++;
+	} else if(change < 0 ) {
+		/* could put SEGFAULT here, but C does not have a check for this, so neither will I ;) */
+		dat_pointer--;
+	} else {
+		dat_pointer = 0;
+	}
+	document.getElementById("dat_pointer_disp").value = dat_pointer;
+}
+
+/* turns on and off data pointer highlight if it has changed this step */
+function dat_point_highlight()
+{
+	//alert(dat_pointer_last_address+"\t"+dat_pointer);
+	if(dat_pointer_last_address != dat_pointer) {
+		//alert("diff");
+		document.getElementById("dat_pointer_disp").style.backgroundColor = "#ff0";
+	} else {
+		//alert("same");
+		document.getElementById("dat_pointer_disp").style.backgroundColor = "#fff";
+	}
+}
+
 </script>
 
 <style type="text/css">
@@ -163,6 +233,18 @@ function ram_modify(address, change)
 	position: absolute;
 	top: 120px;
 	left: 110px;
+}
+
+#da_banner {
+	position: absolute;
+	top: 450px;
+	left: 560px;
+}
+
+#ip_banner {
+	position: absolute;
+	top: 400px;
+	left: 560px;
 }
 
 #output_banner {
@@ -211,6 +293,19 @@ td {
 	left: 550px;
 }
 
+#instruction {
+	position: absolute;
+	top: 425px;
+	left: 550px;
+}
+
+#data {
+	position: absolute;
+	top: 475px;
+	left: 550px;
+
+}
+
 </style>
 <body onLoad="init_form();">
 
@@ -226,11 +321,14 @@ td {
 </center>
 
 <div id="input_banner">INPUT</div>
+<div id="input"><textarea id="code" rows="25" cols="33" onKeyDown="char_check(this);"></textarea></div>
 
-<div id="input">
-<textarea id="code" rows="15" cols="33" onKeyDown="char_check(this);"></textarea>
-</div>
-Instruction Pointer: <input id="ins_pointer_disp" type="text" diabled value=0>
+<div id="ip_banner">INSTRUCTION POINTER</div>
+<div id="instruction"><input id="ins_pointer_disp" type="text" diabled value=0></div>
+
+<div id="da_banner">DATA POINTER</div>
+<div id="data"><input id="dat_pointer_disp" type="text" diabled value=0></div>
+
 <div id="memory_banner">MEMORY</div>
 <div id="ram_disp"></div>
 <div id="output_banner">OUTPUT</div>
