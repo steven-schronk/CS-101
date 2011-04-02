@@ -1,5 +1,5 @@
 <html>
-<title>Turing Machine Simulator</title>
+<title>Turing Tarpit Simulator</title>
 <script>
 
 /* internal values for simulated computer */
@@ -15,6 +15,21 @@ var ram = new Array();
 var disp_code;
 var disp_ram;
 var disp_ins_pointer;
+var disp_pointer = "<div id=disp_pointer>&#8658;</div>"; /* data pointer displayed in memory block */
+
+/* highlight current instruction running on machine */
+function code_highlight(inputEl, selStart, selEnd) {
+	if (inputEl.setSelectionRange) {
+		inputEl.focus();
+		inputEl.setSelectionRange(selStart, selEnd);
+	} else if (inputEl.createTextRange) {
+		var range = inputEl.createTextRange();
+		range.collapse(true);
+		range.moveEnd('character', selEnd);
+		range.moveStart('character', selStart);
+		range.select();
+ 	}
+}
 
 /* turns breakpoints on and off */
 function debug_toggle_breakpoints()
@@ -48,6 +63,9 @@ function exe_nxt_inst()
 	}
 
 	ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
+
+	/* highlight code currently executing on screen */
+	code_highlight(code, ins_pointer-1, ins_pointer);
 
 	switch(ins)
 	{
@@ -86,6 +104,7 @@ function reset()
 	ram_highlight_clear();
 	dat_point_highlight();
 	document.getElementById("output_disp").innerHTML = '';
+	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
 }
 
 /* stop stepping through code on timer if breakpoints enabled */
@@ -139,6 +158,7 @@ function init_form()
 	disp_ram = document.getElementById("ram_disp");
 	ram_reset();
 	ram_init();
+	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
 	/* reset_output(); */
 }
 
@@ -187,15 +207,19 @@ function ram_highlight_clear()
 function ram_init()
 {
 	var i;
-	var table = "<table id=memory_table><tr><td>A</td><td>V</td><td>A</td><td>V</td><td>A</td><td>V</td><td>A</td><td>V</td></tr>\n";
+	var table = "<table id=memory_table>\n";
 	for(i=0; i < 16; i++){
 		if(i%2==0) {
 			table += "\t<tr>";
 		} else {
 			table += "\t<tr class=odd>";
 		}
-		table += "<td>"+i+"</td><td id=ram_"+i+">"+ram[i]+"</td><td>"+(i+16)+"</td><td id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
-		table += "<td>"+(i+32)+"</td><td id=ram_"+(i+32)+">"+ram[i+32]+"</td><td>"+(i+48)+"</td><td id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
+		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td><td width='35' class=ram id=ram_"+i+">";
+		table += ram[i]+"</td><td width='35' class=addr id=addr_"+(i+16)+">";
+		table += (i+16)+"</td><td class=ram id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
+		table += "<td class=addr id=addr_"+(i+32)+">"+(i+32)+"</td><td width='35' class=ram id=ram_";
+		table += (i+32)+">"+ram[i+32]+"</td><td class=addr id=addr_";
+		table += (i+48)+">"+(i+48)+"</td><td width='35' class=ram id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
@@ -210,7 +234,6 @@ function ram_modify(address, change)
 {
 	if(address < 0 || address > 63) {
 		alert("SEGFAULT: Cannot Modify Data Outside of Memory Range");
-		reset();
 		return;
 	}
 
@@ -238,6 +261,17 @@ function dat_point_modify(change)
 	} else {
 		dat_pointer = 0;
 	}
+
+	/* place '>' char next to memory address in table */
+	if(dat_pointer >= 0 && dat_pointer < 64) {
+		document.getElementById("addr_"+dat_pointer).innerHTML = dat_pointer + disp_pointer;
+	}
+
+	/* remove '>' char next to memory address in table */
+	if(dat_pointer_last_address >= 0 && dat_pointer_last_address < 64) {
+		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
+	}
+
 	document.getElementById("dat_pointer_disp").value = dat_pointer;
 	dat_pointer_changed = 1;
 }
@@ -273,34 +307,49 @@ function print_mem()
 
 <style type="text/css">
 
+body {
+	font-family: Tahoma, Arial, Helvetica, sans-serif;
+}
+
+#disp_pointer {
+	float:right;
+	color: #f00;
+}
+
+#code_buttons {
+	position: absolute;
+	top: 570px;
+	left: 10px;
+}
+
 #input_banner {
 	position: absolute;
 	top: 120px;
-	left: 110px;
+	left: 10px;
 }
 
 #da_banner {
 	position: absolute;
 	top: 450px;
-	left: 560px;
+	left: 625px;
 }
 
 #ip_banner {
 	position: absolute;
 	top: 400px;
-	left: 560px;
+	left: 625px;
 }
 
 #output_banner {
 	position: absolute;
 	top: 120px;
-	left: 600px;
+	left: 625px;
 }
 
 #memory_banner {
 	position: absolute;
 	top: 120px;
-	left: 355px;
+	left: 315px;
 }
 
 #input {
@@ -322,6 +371,7 @@ function print_mem()
 
 td {
 	padding: 5px;
+	border-bottom:1px solid #000;
 }
 
 .odd {
@@ -331,44 +381,64 @@ td {
 	border-bottom: 1px solid #cef;
 }
 
+.addr {
+	color: #00f;
+}
+
+.ram {
+	border-right:1px solid #000;
+}
+
 #output {
 	position: absolute;
 	top: 140px;
-	left: 550px;
+	left: 625px;
 }
 
 #instruction {
 	position: absolute;
 	top: 425px;
-	left: 550px;
+	left: 625px;
 }
 
 #data {
 	position: absolute;
 	top: 475px;
-	left: 550px;
+	left: 625px;
 
 }
 
 </style>
 <body onLoad="init_form();">
 
-<center><h2>Turing Machine Simulator</h2></center>
+<center><h2>Turing Tarpit Simulator</h2></center>
 
 <center>
 <button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png"></button>
+&nbsp;&nbsp;
 <button onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png"></button>
+&nbsp;&nbsp;
 <button onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png"></button>
+&nbsp;&nbsp;
 <button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
+&nbsp;&nbsp;
 <button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
+&nbsp;&nbsp;
 <button disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
 </center>
 
-<button id="dbg_status" onClick='debug_toggle_breakpoints();'><img src="http://opentextbook.info/icons/32x32/bug_add.png"></button>
-<button id="dbg_status" onClick='debug_remove_breakpoints();'><img src="http://opentextbook.info/icons/32x32/bin.png"></button>
+<div id="code_buttons">
+<button id="dbg_status" onClick='debug_toggle_breakpoints();'>
+	<img src="http://opentextbook.info/icons/32x32/bug_add.png">
+</button>
+&nbsp;&nbsp;
+<button id="dbg_status" onClick='debug_remove_breakpoints();'>
+	<img src="http://opentextbook.info/icons/32x32/bin.png">
+</button>
+</div>
 
 <div id="input_banner">INPUT</div>
-<div id="input"><textarea id="code" rows="25" cols="33"></textarea></div>
+<div id="input"><textarea id="code" rows="27" cols="38"></textarea></div>
 
 <div id="ip_banner">INSTRUCTION POINTER</div>
 <div id="instruction"><input id="ins_pointer_disp" type="text" diabled value=0></div>
@@ -380,7 +450,7 @@ td {
 <div id="ram_disp"></div>
 <div id="output_banner">OUTPUT</div>
 <div id="output">
-<textarea name=code id=output_disp rows="15" cols="30" disabled ></textarea>
+<textarea name=code id=output_disp rows="15" cols="38" disabled ></textarea>
 </div>
 
 </body>
