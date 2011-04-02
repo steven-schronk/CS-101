@@ -3,10 +3,12 @@
 <script>
 
 /* internal values for simulated computer */
-var ins_pointer = 0; /* instruction pointer */
-var dat_pointer = 0; /* data pointer */
-var dat_pointer_last_address = 0; /* address of data pointer in last step */
-var ram_last_address = 0; /* address of RAM updated in last step */
+var ins_pointer = 0; 			/* instruction pointer */
+var dat_pointer = 0; 			/* data pointer */
+var dat_pointer_changed = 0; 		/* bool set to 1 if data pointer has changed in the last step */
+var dat_pointer_last_address = 0; 	/* address of data pointer in last step */
+var ram_last_address = 0; 		/* address of RAM updated in last step */
+var breakpoints = 1; 			/* bool set to 0 to ignore breakpoints */
 var ram = new Array();
 
 /* objects that display data to the user */
@@ -14,11 +16,26 @@ var disp_code;
 var disp_ram;
 var disp_ins_pointer;
 
-/* only allow turing machine chars in source box - all others ignored */
-function char_check(e)
+/* turns breakpoints on and off */
+function debug_toggle_breakpoints()
 {
-	e.value = e.value.replace( /9/g , '' );
-	/* only allowed chars in input ><+-.,[] */
+	var button = document.getElementById("dbg_status");
+	if(breakpoints) {
+		breakpoints=0;
+		button.innerHTML='<img src="http://opentextbook.info/icons/32x32/bug_delete.png">';
+	}else {
+		breakpoints=1;
+		button.innerHTML='<img src="http://opentextbook.info/icons/32x32/bug_add.png">';
+	}
+}
+
+/* removes all breakpoints in source code */
+function debug_remove_breakpoints()
+{
+	/* ask user for permission first */
+	var ans = confirm("Permanently remove all breakpoints from code?");
+	var code = document.getElementById("code");
+	if(ans) { code.value = code.value.replace( /\*/g , '' ); }
 }
 
 /* execute next instruction from input */
@@ -36,10 +53,10 @@ function exe_nxt_inst()
 	switch(ins)
 	{
 		case '+':
-			ram_modify(ins_pointer, 1);
+			ram_modify(dat_pointer, 1);
   			break;
 		case '-':
-			ram_modify(ins_pointer, -1);
+			ram_modify(dat_pointer, -1);
   			break;
 		case '>':
 			dat_point_modify(1);
@@ -47,15 +64,15 @@ function exe_nxt_inst()
 		case '<':
 			dat_point_modify(-1);
 			break;
+		case '*': /* these are comments - a break from the standard language */
+			if(breakpoints) { stop(); }
+			break;
+		case '.':
+			print_mem();
+			break;
 		default:
   			/* must be a comment :) */
 	}
-
-	/*
-	alert(document.getElementById("code").value.length);
-	alert(document.getElementById("code").value);
-	alert(document.getElementById("code").value.substring(0,1));
-	*/
 }
 
 /*
@@ -69,6 +86,19 @@ function reset()
 	ram_reset();
 	ram_highlight_clear();
 	dat_point_highlight();
+	document.getElementById("output_disp").innerHTML = '';
+}
+
+/* stop stepping through code on timer if breakpoints enabled */
+function stop()
+{
+	alert("stop");
+}
+
+/* run through program on timer, stopping at breakpoints if enabled */
+function run()
+{
+	while(true) { step_next(); }
 }
 
 /* step forward one instruction */
@@ -95,10 +125,10 @@ function step_back()
 */
 function update_ins_pointer(direction)
 {
-		if(direction < 0 && ins_pointer != 0 ) { ins_pointer--; }
-		else if (direction == 0 ) { ins_pointer = 0; }
-		else { ins_pointer++; }
-		disp_ins_pointer.value =  ins_pointer;
+	if(direction < 0 && ins_pointer != 0 ) { ins_pointer--; }
+	else if (direction == 0 ) { ins_pointer = 0; }
+	else { ins_pointer++; }
+	disp_ins_pointer.value =  ins_pointer;
 }
 
 /* setup virtual machine - must be called on page load */
@@ -122,8 +152,7 @@ function ram_reset()
 /* update background color of one memory address */
 function ram_highlight(address)
 {
-	var disp_last_address  = document.getElementById("ram_"+ram_last_address);
-
+	var disp_last_address = document.getElementById("ram_"+ram_last_address);
 	if(address%2==0) { /* will reset to original color of _stiped_ table */
 		document.getElementById("ram_"+address).style.backgroundColor = "#ff0";
 	} else {
@@ -166,14 +195,14 @@ function ram_init()
 			table += "\t<tr class=odd>";
 		}
 		table += "<td>"+i+"</td><td id=ram_"+i+">"+ram[i]+"</td><td>"+(i+16)+"</td><td id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
-			table += "<td>"+(i+32)+"</td><td id=ram_"+(i+32)+">"+ram[i+32]+"</td><td>"+(i+48)+"</td><td id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
+		table += "<td>"+(i+32)+"</td><td id=ram_"+(i+32)+">"+ram[i+32]+"</td><td>"+(i+48)+"</td><td id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
 }
 
 /* modify the value at this address - reset RAM highlights for all addresses
-	1 inrement RAM by one
+	1 increment RAM by one
 	0 set RAM to 0
 	-1 decrement RAM by one
 */
@@ -210,19 +239,34 @@ function dat_point_modify(change)
 		dat_pointer = 0;
 	}
 	document.getElementById("dat_pointer_disp").value = dat_pointer;
+	dat_pointer_changed = 1;
 }
 
 /* turns on and off data pointer highlight if it has changed this step */
 function dat_point_highlight()
 {
+	var dat = document.getElementById("dat_pointer_disp");
 	//alert(dat_pointer_last_address+"\t"+dat_pointer);
-	if(dat_pointer_last_address != dat_pointer) {
+	if(dat_pointer_changed) {
 		//alert("diff");
-		document.getElementById("dat_pointer_disp").style.backgroundColor = "#ff0";
+		dat.style.backgroundColor = "#ff0";
+		dat_pointer_changed = 0;
 	} else {
 		//alert("same");
-		document.getElementById("dat_pointer_disp").style.backgroundColor = "#fff";
+		dat.style.backgroundColor = "#fff";
 	}
+
+	/* as a convenience to the user, set to red if pointer is out of memory range */
+	if(dat_pointer < 0 || dat_pointer > 63) {
+		dat.style.backgroundColor = "#f00";
+	}
+}
+
+/* print ASCII representation of memory at data pointer */
+function print_mem()
+{
+	var x = String.fromCharCode(ram[dat_pointer]);
+	document.getElementById("output_disp").innerHTML += x;
 }
 
 </script>
@@ -312,16 +356,19 @@ td {
 <center><h2>Turing Machine Simulator</h2></center>
 
 <center>
-<button name="step" onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png"></button>
-<button name="step" onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png"></button>
-<button name="step" onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png"></button>
-<button name="step" disabled><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
-<button name="step" onClick='reset();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
-<button name="step" disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
+<button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png"></button>
+<button onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png"></button>
+<button onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png"></button>
+<button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
+<button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
+<button disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
 </center>
 
+<button id="dbg_status" onClick='debug_toggle_breakpoints();'><img src="http://opentextbook.info/icons/32x32/bug_add.png"></button>
+<button id="dbg_status" onClick='debug_remove_breakpoints();'><img src="http://opentextbook.info/icons/32x32/bin.png"></button>
+
 <div id="input_banner">INPUT</div>
-<div id="input"><textarea id="code" rows="25" cols="33" onKeyDown="char_check(this);"></textarea></div>
+<div id="input"><textarea id="code" rows="25" cols="33"></textarea></div>
 
 <div id="ip_banner">INSTRUCTION POINTER</div>
 <div id="instruction"><input id="ins_pointer_disp" type="text" diabled value=0></div>
@@ -333,7 +380,7 @@ td {
 <div id="ram_disp"></div>
 <div id="output_banner">OUTPUT</div>
 <div id="output">
-<textarea name=code  rows="15" cols="30" disabled ></textarea>
+<textarea name=code id=output_disp rows="15" cols="30" disabled ></textarea>
 </div>
 
 </body>

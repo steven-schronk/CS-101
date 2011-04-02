@@ -1,0 +1,15 @@
+Data pointer flashes  unnecessarily when computer is reset.
+
+Cannot visually see which command currently being executed by computer.
+
+Memory values too narrow, jump on screen when more digits are needed.
+
+Buttons need to be moved to correct locations.
+
+Need method to load/save code for later use.
+
+Cannot run code to end, loops on halt instruction.
+
+Advancing to next instruction does not skip comment code and probably should.
+
+Need indicator in memory block to show which location data pointer is pointing to.
