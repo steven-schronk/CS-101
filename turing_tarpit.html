@@ -56,13 +56,19 @@ function debug_remove_breakpoints()
 /* execute next instruction from input */
 function exe_nxt_inst()
 {
+	var temp_count = 0;
 	var code = document.getElementById("code");
+	//var valid = "/\+-><\*\./"; 
 	var ins = null; /* current instruction from code */
 	if(ins_pointer > code.value.length) {
 		alert("HALT: Program is Complete");
 	}
 
-	ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
+	do {
+		if(ins_pointer > code.value.length) { break; } /* must stop at end of code */
+		update_ins_pointer(1);
+		ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
+	}while(ins != '+' &&  ins != '-' &&  ins != '>' &&  ins != '<' &&  ins != '*' &&  ins != '.');
 
 	/* highlight code currently executing on screen */
 	code_highlight(code, ins_pointer-1, ins_pointer);
@@ -105,6 +111,7 @@ function reset()
 	dat_point_highlight();
 	document.getElementById("output_disp").innerHTML = '';
 	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
+	dat_point_highlight_clear();
 }
 
 /* stop stepping through code on timer if breakpoints enabled */
@@ -123,7 +130,7 @@ function run()
 /* step forward one instruction */
 function step_next()
 {
-	update_ins_pointer(1);
+	//update_ins_pointer(1);
 	exe_nxt_inst();
 	dat_point_highlight();
 }
@@ -294,6 +301,13 @@ function dat_point_highlight()
 	if(dat_pointer < 0 || dat_pointer > 63) {
 		dat.style.backgroundColor = "#f00";
 	}
+}
+
+/* remove highlight from data pointer */
+function dat_point_highlight_clear()
+{
+	var dat = document.getElementById("dat_pointer_disp");
+	dat.style.backgroundColor = "#fff";
 }
 
 /* print ASCII representation of memory at data pointer */

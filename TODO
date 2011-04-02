@@ -1,8 +1,4 @@
-Data pointer flashes unnecessarily when computer is reset.
-
 Need method to load/save code for later use.
-
-Advancing to next instruction does not skip comment code and probably should.
 
 Memory locations no longer flashing yellow when data is changed more than once.
 
@@ -13,3 +9,5 @@ When in run mode, a SEGFAULT will cause an endless loop.
 First column of Memory table wider than other columns.
 
 Need better pointer character for data pointer in memory area.
+
+Not displaying HALT message when in run mode. Caused by loop skipping comments.
