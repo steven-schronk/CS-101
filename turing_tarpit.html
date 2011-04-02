@@ -45,7 +45,6 @@ function exe_nxt_inst()
 	var ins = null; /* current instruction from code */
 	if(ins_pointer > code.value.length) {
 		alert("HALT: Program is Complete");
-		reset();
 	}
 
 	ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
@@ -98,7 +97,8 @@ function stop()
 /* run through program on timer, stopping at breakpoints if enabled */
 function run()
 {
-	while(true) { step_next(); }
+	var total_steps = document.getElementById("code").value.length;
+	while(ins_pointer <= total_steps) { step_next(); }
 }
 
 /* step forward one instruction */

@@ -1,4 +1,4 @@
-Data pointer flashes  unnecessarily when computer is reset.
+Data pointer flashes unnecessarily when computer is reset.
 
 Cannot visually see which command currently being executed by computer.
 
@@ -8,8 +8,10 @@ Buttons need to be moved to correct locations.
 
 Need method to load/save code for later use.
 
-Cannot run code to end, loops on halt instruction.
-
 Advancing to next instruction does not skip comment code and probably should.
 
 Need indicator in memory block to show which location data pointer is pointing to.
+
+Memory locations no longer flashing yellow when data is changed.
+
+Lines in code too long for git sites.  Trim to fewer characters.
