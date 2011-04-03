@@ -1,13 +1,9 @@
 Need method to load/save code for later use.
 
-Memory locations no longer flashing yellow when data is changed more than once.
-
 Bottom line on memory table missing.
 
 When in run mode, a SEGFAULT will cause an endless loop.
 
 First column of Memory table wider than other columns.
-
-Need better pointer character for data pointer in memory area.
 
 Not displaying HALT message when in run mode. Caused by loop skipping comments.

@@ -93,6 +93,10 @@ function exe_nxt_inst()
 		case '.':
 			print_mem();
 			break;
+		case '[':
+			break;
+		case ']':
+			break;
 		default:
   			/* must be a comment :) */
 	}
@@ -176,17 +180,15 @@ function ram_reset()
 	for(i=0; i < 64; i++) { ram[i] = 0; }
 }
 
-/* update background color of one memory address */
+/* update highlight of one memory address and release other highlight if needed */
 function ram_highlight(address)
 {
 	var disp_last_address = document.getElementById("ram_"+ram_last_address);
-	if(address%2==0) { /* will reset to original color of _stiped_ table */
-		document.getElementById("ram_"+address).style.backgroundColor = "#ff0";
-	} else {
-		document.getElementById("ram_"+address).style.backgroundColor = "#de0";
-	}
+	/* highlight background of current address */
+	document.getElementById("ram_"+address).style.backgroundColor = "#ff0";
 
-	if(disp_last_address) {
+	/* remove highlight from last address modified */
+	if(ram_last_address != address){
 		if(ram_last_address%2==0) {
 			disp_last_address.style.backgroundColor = "#fff";
 		} else {
@@ -232,7 +234,8 @@ function ram_init()
 	disp_ram.innerHTML = table;
 }
 
-/* modify the value at this address - reset RAM highlights for all addresses
+/*
+	modify the value at this address - reset RAM highlights for all addresses
 	1 increment RAM by one
 	0 set RAM to 0
 	-1 decrement RAM by one
@@ -287,13 +290,10 @@ function dat_point_modify(change)
 function dat_point_highlight()
 {
 	var dat = document.getElementById("dat_pointer_disp");
-	//alert(dat_pointer_last_address+"\t"+dat_pointer);
 	if(dat_pointer_changed) {
-		//alert("diff");
 		dat.style.backgroundColor = "#ff0";
 		dat_pointer_changed = 0;
 	} else {
-		//alert("same");
 		dat.style.backgroundColor = "#fff";
 	}
 
@@ -313,7 +313,7 @@ function dat_point_highlight_clear()
 /* print ASCII representation of memory at data pointer */
 function print_mem()
 {
-	var x = String.fromCharCode(ram[dat_pointer]);
+	var x = String.fromCharCode(63+ram[dat_pointer]);
 	document.getElementById("output_disp").innerHTML += x;
 }
 
