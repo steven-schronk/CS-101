@@ -9,3 +9,5 @@ Not displaying HALT message when in run mode. Caused by loop skipping comments.
 Implement all instructions for language.
 
 Need stop button that works with endless loops. (Could pause program to allow button click?)
+
+Add ability to modify memory location at any time.

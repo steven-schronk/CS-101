@@ -18,6 +18,7 @@ var halt = false;			/* halts program ASAP */
 var disp_code;
 var disp_ram;
 var disp_ins_pointer;
+var disp_dat_pointer;
 var disp_pointer = "<div id=disp_pointer>&#8658;</div>"; /* data pointer displayed in memory block */
 
 /* highlight current instruction running on machine */
@@ -227,11 +228,29 @@ function update_ins_pointer(direction)
 	disp_ins_pointer.value =  ins_pointer;
 }
 
+/* update instruction pointer and set to new value */
+function ins_point_modify_by_address(val)
+{
+	/* instruction pointer can never be less than 0 */
+	if(val < 0) {
+		alert("Instruction Pointer cannot be set less than Zero.");
+		disp_ins_pointer.value =  ins_pointer; /* reset val to previous */
+		return;
+	}
+	if(val > disp_code.value.length) {
+		alert("Instruction Pointer cannot be set beyond end of code.\n Current length of code: " + disp_code.value.length);
+		disp_ins_pointer.value =  ins_pointer; /* reset val to previous */
+		return;
+	}
+	ins_pointer = disp_ins_pointer.value;
+}
+
 /* setup virtual machine - must be called on page load */
 function init_form()
 {
 	disp_code  = document.getElementById("code");
 	disp_ins_pointer = document.getElementById("ins_pointer_disp");
+	disp_dat_pointer = document.getElementById("dat_pointer_disp");
 	disp_ram = document.getElementById("ram_disp");
 	ram_reset();
 	ram_init();
@@ -327,7 +346,13 @@ function ram_modify(address, change)
 	ram_last_address = address;
 }
 
-/* modify state of data pointer */
+/*
+	modify state of data pointer
+	1 increment data pointer by one
+	0 set data pointer to 0
+	-1 decrement data pointer by one
+
+*/
 function dat_point_modify(change)
 {
 	dat_pointer_last_address = dat_pointer;
@@ -350,32 +375,47 @@ function dat_point_modify(change)
 		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
 	}
 
-	document.getElementById("dat_pointer_disp").value = dat_pointer;
+	disp_dat_pointer.value = dat_pointer;
 	dat_pointer_changed = 1;
+}
+
+function dat_point_modify_by_address(val)
+{
+	dat_pointer_last_address = dat_pointer;
+	dat_pointer = disp_dat_pointer.value;
+	/* place '>' char next to memory address in table */
+	if(dat_pointer >= 0 && dat_pointer < 64) {
+		document.getElementById("addr_"+dat_pointer).innerHTML = dat_pointer + disp_pointer;
+	}
+
+	/* remove '>' char next to memory address in table */
+	if(dat_pointer_last_address >= 0 && dat_pointer_last_address < 64) {
+		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
+	}
+	dat_pointer_changed = 1;
+	dat_point_highlight();
 }
 
 /* turns on and off data pointer highlight if it has changed this step */
 function dat_point_highlight()
 {
-	var dat = document.getElementById("dat_pointer_disp");
 	if(dat_pointer_changed) {
-		dat.style.backgroundColor = "#ff0";
+		disp_dat_pointer.style.backgroundColor = "#ff0";
 		dat_pointer_changed = 0;
 	} else {
-		dat.style.backgroundColor = "#fff";
+		disp_dat_pointer.style.backgroundColor = "#fff";
 	}
 
 	/* as a convenience to the user, set to red if pointer is out of memory range */
 	if(dat_pointer < 0 || dat_pointer > 63) {
-		dat.style.backgroundColor = "#f00";
+		disp_dat_pointer.style.backgroundColor = "#f00";
 	}
 }
 
 /* remove highlight from data pointer */
 function dat_point_highlight_clear()
 {
-	var dat = document.getElementById("dat_pointer_disp");
-	dat.style.backgroundColor = "#fff";
+	disp_dat_pointer.style.backgroundColor = "#fff";
 }
 
 /* print ASCII representation of memory at data pointer */
@@ -523,10 +563,10 @@ td {
 <div id="input"><textarea id="code" rows="27" cols="38"></textarea></div>
 
 <div id="ip_banner">INSTRUCTION POINTER</div>
-<div id="instruction"><input id="ins_pointer_disp" type="text" diabled value=0></div>
+<div id="instruction"><input  onBlur="ins_point_modify_by_address(disp_ins_pointer.value);" id="ins_pointer_disp" type="text" diabled value=0></div>
 
 <div id="da_banner">DATA POINTER</div>
-<div id="data"><input id="dat_pointer_disp" type="text" diabled value=0></div>
+<div id="data"><input onBlur="dat_point_modify_by_address(disp_dat_pointer.value);" id="dat_pointer_disp" type="text" diabled value=0></div>
 
 <div id="memory_banner">MEMORY</div>
 <div id="ram_disp"></div>
