@@ -9,7 +9,10 @@ var dat_pointer_changed = 0; 		/* bool set to 1 if data pointer has changed in t
 var dat_pointer_last_address = 0; 	/* address of data pointer in last step */
 var ram_last_address = 0; 		/* address of RAM updated in last step */
 var breakpoints = 1; 			/* bool set to 0 to ignore breakpoints */
-var ram = new Array();
+var ram = new Array();			/* memory of virtual machine */
+var jmp = new Array();			/* used as a stack to jump from one command to another */
+var ins = null; 			/* current instruction from code */
+var halt = false;			/* halts program ASAP */
 
 /* objects that display data to the user */
 var disp_code;
@@ -53,26 +56,57 @@ function debug_remove_breakpoints()
 	if(ans) { code.value = code.value.replace( /\*/g , '' ); }
 }
 
+/* test current code character - return true if it is an instruction */
+/* tried to use regex on this and could not get it to work :( */
+function tst_inst()
+{
+	if(ins == '+' ||  ins == '-' ||  ins == '>' ||  ins == '<' ||
+	  ins == '*' ||  ins == '.' ||  ins == '[' ||  ins == ']' ||  ins == ',') {
+		return true;
+	}
+	return false;
+}
+
+/* find next instruction in code and move instruction pointer to it */
+function fnd_nxt_inst()
+{
+	do {
+		if(ins_pointer > disp_code.value.length) { break; } /* must stop at end of code */
+		update_ins_pointer(1);
+		ins = disp_code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
+	}while(!tst_inst());
+	if(ins_pointer > disp_code.value.length) {
+		alert("HALT: Program is Complete");
+		halt = true;
+		reset();
+	}
+	
+	/* highlight code currently executing on screen */
+	code_highlight(disp_code, ins_pointer-1, ins_pointer);
+}
+
+/* find previous instruction in code and move instruction pointer to it */
+function fnd_prv_inst()
+{
+	ins_pointer--;
+	while(ins_pointer >= 0)
+	{
+		ins = disp_code.value.substring(ins_pointer-1, ins_pointer); /* get data at ins_pointer location */
+		if(tst_inst()) { return; }
+		ins_pointer--;
+	}
+	if(ins_pointer == 0) {
+		alert("SEGFAULT: Program could not find corresponding jump instruction");
+		halt = true;
+		reset();
+	}
+}
+
 /* execute next instruction from input */
 function exe_nxt_inst()
 {
-	var temp_count = 0;
-	var code = document.getElementById("code");
-	//var valid = "/\+-><\*\./"; 
-	var ins = null; /* current instruction from code */
-	if(ins_pointer > code.value.length) {
-		alert("HALT: Program is Complete");
-	}
-
-	do {
-		if(ins_pointer > code.value.length) { break; } /* must stop at end of code */
-		update_ins_pointer(1);
-		ins = code.value.substring(ins_pointer-1,ins_pointer); /* get data at ins_pointer location */
-	}while(ins != '+' &&  ins != '-' &&  ins != '>' &&  ins != '<' &&  ins != '*' &&  ins != '.');
-
-	/* highlight code currently executing on screen */
-	code_highlight(code, ins_pointer-1, ins_pointer);
-
+	var temp_count = 0; 
+	fnd_nxt_inst();
 	switch(ins)
 	{
 		case '+':
@@ -94,11 +128,43 @@ function exe_nxt_inst()
 			print_mem();
 			break;
 		case '[':
+			jump_fwd();
 			break;
 		case ']':
+			jump_bak();
+			break;
+		case ',':
 			break;
 		default:
   			/* must be a comment :) */
+	}
+}
+
+/* if byte at data pointer is = 0, jump forward to instruction after matching ']' command */
+function jump_fwd()
+{
+	if(ram[dat_pointer] != 0) { return; }
+	/* add this jump to stack */
+	jmp.push('[');
+	/* loop through code, pushing and popping stack until stack is empty */
+	while(jmp.length > 0) {
+		fnd_nxt_inst();
+		if(ins == ']') { jmp.pop();
+		} else if (ins == '[') { jmp.push(']'); }
+	}
+}
+
+/* if byte at data pointer is != 0, jump back to instruction after matching '[' command */
+function jump_bak()
+{
+	if(ram[dat_pointer] == 0) { return; }
+	/* add this jump to stack */
+	jmp.push(']');
+	/* loop through code, pushing and popping stack until stack is empty */
+	while(jmp.length > 0 && ins_pointer > 0) {
+		fnd_prv_inst();
+		if(ins == '[') { jmp.pop();
+		} else if (ins == ']') { jmp.push(']'); }
 	}
 }
 
@@ -121,14 +187,14 @@ function reset()
 /* stop stepping through code on timer if breakpoints enabled */
 function stop()
 {
-	alert("stop");
+	halt = true;
 }
 
 /* run through program on timer, stopping at breakpoints if enabled */
 function run()
 {
 	var total_steps = document.getElementById("code").value.length;
-	while(ins_pointer <= total_steps) { step_next(); }
+	while(ins_pointer <= total_steps && halt == false) { step_next(); }
 }
 
 /* step forward one instruction */
@@ -244,6 +310,8 @@ function ram_modify(address, change)
 {
 	if(address < 0 || address > 63) {
 		alert("SEGFAULT: Cannot Modify Data Outside of Memory Range");
+		halt = true;
+		reset();
 		return;
 	}
 
@@ -436,7 +504,7 @@ td {
 &nbsp;&nbsp;
 <button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
 &nbsp;&nbsp;
-<button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
+<button onClick='halt();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
 &nbsp;&nbsp;
 <button disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
 </center>

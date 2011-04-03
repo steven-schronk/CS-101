@@ -5,3 +5,7 @@ When in run mode, a SEGFAULT will cause an endless loop.
 First column of Memory table wider than other columns.
 
 Not displaying HALT message when in run mode. Caused by loop skipping comments.
+
+Implement all instructions for language.
+
+Need stop button that works with endless loops. (Could pause program to allow button click?)
