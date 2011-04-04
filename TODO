@@ -9,3 +9,7 @@ Implement all instructions for language.
 Need stop button that works with endless loops. (Could pause program to allow button click?)
 
 Add ability to modify memory location at any time.
+
+Sample programs in documentation that can be loaded into code window by clicking a button.
+
+Find decent color scheme for the tool. Set some standards and put them in the page.

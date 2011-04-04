@@ -429,12 +429,28 @@ function print_mem()
 function display_docs()
 {
 	disp_docs.style.visibility = "visible";
+	docs_select("docs_main");
 }
 
 /* hide documentation from user */
 function hide_docs()
 {
 	disp_docs.style.visibility = "hidden";
+}
+
+function docs_select(page)
+{
+	if(page == "basic") {
+		document.getElementById("docs_content").innerHTML = document.getElementById("docs_basic").innerHTML;
+	} else if(page == "features") {
+		document.getElementById("docs_content").innerHTML = document.getElementById("docs_features").innerHTML;
+	} else if(page == "examples") {
+		document.getElementById("docs_content").innerHTML = document.getElementById("docs_examples").innerHTML;
+	} else if(page == "examples2") {
+		document.getElementById("docs_content").innerHTML = document.getElementById("docs_examples2").innerHTML;
+	} else {
+		document.getElementById("docs_content").innerHTML = document.getElementById("docs_main").innerHTML;
+	}
 }
 
 </script>
@@ -538,16 +554,16 @@ body {
 	border:1px solid #000;
 	background-color: #dfd;
 	position: absolute;
-	top: 160px;
-	left: 20px;
-	width: 900px;
-	height:500px;
+	top: 10px;
+	left: 10px;
+	width: 1000px;
+	height:700px;
 	visibility: hidden;
 }
 
 #docs_top_banner {
 	color: #fff;
-	background-color: #00f;
+	background-color: #88f;
 	border-bottom:1px solid #000;
 	position: absolute;
 	top: 0px;
@@ -555,7 +571,7 @@ body {
 	height: 25px;
 	padding-top: 5px;
 	padding-left: 5px;
-	width: 895px;
+	width: 995px;
 }
 
 #docs_close_btn {
@@ -565,6 +581,43 @@ body {
 	top: 0px;
 	right: 0px;
 	height: 25px;
+	cursor: pointer;
+}
+
+#docs_mnu_btn {
+	border:2px solid #000;
+	background-color: #faa;
+	color: #000;
+	position: absolute;
+	top: 0px;
+	left: 375px;
+	height: 25px;
+	padding-top: 3px;
+	padding-left: 20px;
+	padding-right: 20px;
+	cursor: pointer;
+}
+
+#docs_content {
+	position: absolute;
+	top: 35px;
+	padding: 10px;
+}
+
+#docs_link:hover {
+	background-color: #faa;
+	cursor: pointer;
+
+}
+
+.docs_code_ex {
+	background-color: #fff;
+	border: 1px solid #ddd;
+	padding: 5px;
+}
+
+.docs_hidden {
+	visibility: hidden;
 }
 
 #instruction {
@@ -644,8 +697,135 @@ body {
 <textarea name=code id=output_disp rows="10" cols="38" disabled ></textarea>
 </div>
 <div id="docs">
-	<div id="docs_top_banner">Turing Tarpit Simulator Documentation<div id="docs_close_btn" onClick="hide_docs();">X</div></div>
+	<div id="docs_top_banner">
+		Turing Tarpit Simulator Documentation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<div id="docs_mnu_btn" onClick="docs_select('main');">Main Menu</div>
+		<div id="docs_close_btn" onClick="hide_docs();">X</div></div>
 
+	<div id="docs_content"></div>
+</div>
+
+<div id="docs_main" class="docs_hidden">
+		<div id="docs_link" onClick="docs_select('basic');">Basic Operation</div>
+		<div id="docs_link" onClick="docs_select('features');">Features and Hints</div>
+		<div id="docs_link" onClick="docs_select('examples');">Example Code 1</div>
+		<div id="docs_link" onClick="docs_select('examples2');">Example Code 2</div>
+		
+</div>
+
+<div id="docs_basic" class="docs_hidden">
+
+Basic
+
+<p>This program is completely self contained in one HTML document.  You are free do use it how you wish, subject to the terms and conditions of the GNU GPL license (version 3).
+
+<p>Although it has not been tested in all browsers, it should work well under most any modern web browser that supports Dynamic HTML and JavaScript.  You must have JavaScript enabled for this application to work properly.
+
+<p>No server interaction or outside service is needed for this program to operate.
+
+</div>
+
+<div id="docs_features" class="docs_hidden">
+
+Features and Hints
+
+<p>All characters outside the Instruction Set are considered comments and will be skipped over during runtime.
+
+<p>While program executes, the Input cursor is moved over the current instruction.
+
+<p>User can change the address of the Data Pointer and Instruction Pointer at any time.
+Memory and pointers that have been modified are highlighted in yellow until the next step.
+
+<p>The Data Pointer can point to any location. If you de-reference a pointer out of memory range, a segfault error will occur. This causes the computer to reboot without warning.
+
+<p>The Instruction Pointer can point to a location range of 1 to the number of characters in the input.
+
+<p>Restarting the machine will reset all Memory, Data and Instruction Pointers to zero.
+
+<p>The output of the program cannot be edited.
+
+<p>A user can add a break instruction in the code using an asterisk '*'. This will cause the machine to pause when in Run Mode. Breaks can be disabled and enabled with the debug button, and can be permanently deleted with the delete button.
+
+<p>In this version the programs you type in are not saved to your computer.  This must be done as a manual operation.
+
+<p>As this program is reliant on the speed and efficiency of your browsers JavaScript implementation some computers will be able to execute programs faster than others.
+
+</div>
+
+<div id="docs_examples" class="docs_hidden">
+These are some examples of programs and snippets to get you started. Click the "Load" button to apply these to the Input of the simulator. (Please Note: You will erase the current program stored there.) Many of these examples can be found at Wikipedia.
+
+<p><b>Clear Byte:</b>
+Sets value at current Data Pointer to Zero.
+<div class=docs_code_ex>
+[-]
+</div>
+<p><b>Clear Previous Cells:</b>
+Sets value of all previous bytes including current byte to Zero.
+<div class=docs_code_ex>
+[[-]<]
+</div>
+<p><b>Rewind:</b>
+Goes back to byte Zero.
+<div class=docs_code_ex>
+[<]>
+</div>
+<p><b>Fast-forward:</b>
+Increments the data pointer until a 0 is found then decrements if until the current cell is non-zero.
+<div class=docs_code_ex>
+[>]<
+</div>
+<p><b>Simple Loop:</b>
+Accepts input from the user and echos it to the screen, similar to the UNIX cat program.
+<div class=docs_code_ex>
+ ,[.,]
+</div>
+<p><b>Moving the Data Pointer:</b>
+Accepts input from the user and saves all input in the memory for future use.
+<div class=docs_code_ex>
+ >,[.>,]
+</div>
+</div>
+
+
+<div id="docs_examples2" class="docs_hidden">
+<p><b>Add Two Bytes:</b>
+Adds current location to the next location and leaves behind a Zero for the first value.
+<div class=docs_code_ex>
+[->+<]
+</div>
+<p><b>Lower To Upper:</b>
+Accepts lower case input from the user and makes it uppercase. Stops when user presses the enter key.
+<div class=docs_code_ex>
+,----------[----------------------.,----------]
+</div>
+<p><b>Copy Value:</b>
+Copy value of byte Zero to byte One.
+<div class=docs_code_ex>
+>[-]>[-]<<[->+>+<<]>>[-<<+>>]<<
+</div>
+<p><b>Seek:</b>
+Move Data Pointer forward until it lands on a byte with a value of 1, preserving all bytes it passes.
+<div class=docs_code_ex>
+-[+>-]+
+</div>
+<p><b>Single Digit Add:</b>
+Adds two single digit numbers and display result. Works on one-digit results only.
+<div class=docs_code_ex>
+,>++++++[<-------->-],[<+>-]<.
+</div>
+<p><b>Single Digit Multiplication:</b>
+Multiply two single digit numbers and display result. Works on one-digit results only.
+<div class=docs_code_ex>
+ ,>,>++++++++[<------<------>>-]
+ <<[>[>+>+<<-]>>[<<+>>-]<<<-]
+ >>>++++++[<++++++++>-]<.>.
+</div>
+<p><b>Single Digit Division:</b>
+Accepts two single-digit numbers from the user, divides them and displays the truncated quotient. Dividend is stored in byte Zero and Divisor is stored in byte One.
+<div class=docs_code_ex>
+,>,>++++++[-<--------<-------->>]<<[>[->+>+<<]>[-<<-[>]>>>[<[>>>-<<<[-]]>>]<<]>>>+<<[-<<+>>]<<<]>[-]>>>>[-<<<<<+>>>>>]<<<<++++++[-<++++++++>]<.
+</div>
 </div>
 </body>
 </html>
