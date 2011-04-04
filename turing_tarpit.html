@@ -15,6 +15,7 @@ var ins = null; 			/* current instruction from code */
 var halt = false;			/* halts program ASAP */
 
 /* objects that display data to the user */
+var disp_docs;
 var disp_code;
 var disp_ram;
 var disp_ins_pointer;
@@ -255,6 +256,7 @@ function init_form()
 	ram_reset();
 	ram_init();
 	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
+	disp_docs = document.getElementById("docs");
 	/* reset_output(); */
 }
 
@@ -304,16 +306,14 @@ function ram_init()
 	var table = "<table id=memory_table>\n";
 	for(i=0; i < 16; i++){
 		if(i%2==0) {
-			table += "\t<tr>";
+			table += "\t<tr class=even>";
 		} else {
 			table += "\t<tr class=odd>";
 		}
-		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td><td width='35' class=ram id=ram_"+i+">";
-		table += ram[i]+"</td><td width='35' class=addr id=addr_"+(i+16)+">";
-		table += (i+16)+"</td><td class=ram id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
-		table += "<td class=addr id=addr_"+(i+32)+">"+(i+32)+"</td><td width='35' class=ram id=ram_";
-		table += (i+32)+">"+ram[i+32]+"</td><td class=addr id=addr_";
-		table += (i+48)+">"+(i+48)+"</td><td width='35' class=ram id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
+		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td><td width='35' class=ram id=ram_"+i+">"+ram[i]+"</td>";
+		table += "<td width='35' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td><td class=ram id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
+		table += "<td class=addr id=addr_"+(i+32)+">"+(i+32)+"</td><td width='35' class=ram id=ram_"+(i+32)+">"+ram[i+32]+"</td>\n";
+		table += "<td class=addr id=addr_"+(i+48)+">"+(i+48)+"</td><td width='35' class=ram id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
@@ -421,8 +421,20 @@ function dat_point_highlight_clear()
 /* print ASCII representation of memory at data pointer */
 function print_mem()
 {
-	var x = String.fromCharCode(63+ram[dat_pointer]);
+	var x = String.fromCharCode(ram[dat_pointer]);
 	document.getElementById("output_disp").innerHTML += x;
+}
+
+/* documentation stored inside invisible div. This shows its contents. */
+function display_docs()
+{
+	disp_docs.style.visibility = "visible";
+}
+
+/* hide documentation from user */
+function hide_docs()
+{
+	disp_docs.style.visibility = "hidden";
 }
 
 </script>
@@ -452,13 +464,19 @@ body {
 
 #da_banner {
 	position: absolute;
-	top: 450px;
+	top: 360px;
+	left: 625px;
+}
+
+#ref_banner {
+	position: absolute;
+	top: 410px;
 	left: 625px;
 }
 
 #ip_banner {
 	position: absolute;
-	top: 400px;
+	top: 315px;
 	left: 625px;
 }
 
@@ -491,15 +509,14 @@ body {
 	border-collapse: collapse;
 }
 
-td {
-	padding: 5px;
+.even td {
+	padding: 4px;
 	border-bottom:1px solid #000;
 }
 
-.odd {
-	background-color: #def;
-}
 .odd td {
+	padding: 4px;
+	background-color: #def;
 	border-bottom: 1px solid #000;
 }
 
@@ -517,17 +534,56 @@ td {
 	left: 625px;
 }
 
+#docs {
+	border:1px solid #000;
+	background-color: #dfd;
+	position: absolute;
+	top: 160px;
+	left: 20px;
+	width: 900px;
+	height:500px;
+	visibility: hidden;
+}
+
+#docs_top_banner {
+	color: #fff;
+	background-color: #00f;
+	border-bottom:1px solid #000;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 25px;
+	padding-top: 5px;
+	padding-left: 5px;
+	width: 895px;
+}
+
+#docs_close_btn {
+	background-color: #f00;
+	border:3px solid #000;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 25px;
+}
+
 #instruction {
 	position: absolute;
-	top: 425px;
+	top: 335px;
 	left: 625px;
 }
 
 #data {
 	position: absolute;
-	top: 475px;
+	top: 385px;
 	left: 625px;
+}
 
+#reference {
+	position: absolute;
+	top: 430px;
+	left: 625px;
+	width: 280px;
 }
 
 </style>
@@ -547,6 +603,8 @@ td {
 <button onClick='halt();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
 &nbsp;&nbsp;
 <button disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
+&nbsp;&nbsp;
+<button onClick='display_docs();'><img src="http://opentextbook.info/icons/32x32/book_open.png"></button>
 </center>
 
 <div id="code_buttons">
@@ -568,13 +626,27 @@ td {
 <div id="da_banner">DATA POINTER</div>
 <div id="data"><input onBlur="dat_point_modify_by_address(disp_dat_pointer.value);" id="dat_pointer_disp" type="text" diabled value=0></div>
 
+<div id="ref_banner">INSTRUCTION REFERENCE</div>
+<table id="reference">
+	<tr><td>+</td><td>increment byte at data pointer</td></tr>
+	<tr><td>-</td><td>decrement byte at data pointer</td></tr>
+	<tr><td>></td><td>increment data pointer</td></tr>
+	<tr><td><</td><td>decrement data pointer</td></tr>
+	<tr><td>.</td><td>print byte at data pointer</td></tr>
+	<tr><td>,</td><td>accept one byte of input</td></tr>
+	<tr><td>*</td><td>set breakpoint</td></tr>
+</table>
+
 <div id="memory_banner">MEMORY</div>
 <div id="ram_disp"></div>
 <div id="output_banner">OUTPUT</div>
 <div id="output">
-<textarea name=code id=output_disp rows="15" cols="38" disabled ></textarea>
+<textarea name=code id=output_disp rows="10" cols="38" disabled ></textarea>
 </div>
+<div id="docs">
+	<div id="docs_top_banner">Turing Tarpit Simulator Documentation<div id="docs_close_btn" onClick="hide_docs();">X</div></div>
 
+</div>
 </body>
 </html>
 
