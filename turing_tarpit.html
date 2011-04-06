@@ -4,6 +4,8 @@
 
 /* internal values for simulated computer */
 var ins_pointer = 0; 			/* instruction pointer */
+var ins_pointer_changed = 0;	/* bool set to 1 if ins pointer has changed in the last step */
+var ins_pointer_last_address = 0; 	/* address of ins pointer in last step */
 var dat_pointer = 0; 			/* data pointer */
 var dat_pointer_changed = 0; 		/* bool set to 1 if data pointer has changed in the last step */
 var dat_pointer_last_address = 0; 	/* address of data pointer in last step */
@@ -22,8 +24,16 @@ var disp_ins_pointer;
 var disp_dat_pointer;
 var disp_pointer = "<div id=disp_pointer>&#8658;</div>"; /* data pointer displayed in memory block */
 
+/* select all contents of this input for the convenience of the user */
+function select_all(e)
+{
+	document.getElementById(e).focus();
+	document.getElementById(e).select();	
+}
+
 /* highlight current instruction running on machine */
-function code_highlight(inputEl, selStart, selEnd) {
+function code_highlight(inputEl, selStart, selEnd)
+{
 	if (inputEl.setSelectionRange) {
 		inputEl.focus();
 		inputEl.setSelectionRange(selStart, selEnd);
@@ -183,7 +193,9 @@ function reset()
 	dat_point_highlight();
 	document.getElementById("output_disp").innerHTML = '';
 	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
+	disp_ins_pointer.style.backgroundColor = "#fff";
 	dat_point_highlight_clear();
+	code_highlight(disp_code, 0, 1);
 }
 
 /* stop stepping through code on timer if breakpoints enabled */
@@ -227,6 +239,8 @@ function update_ins_pointer(direction)
 	else if (direction == 0 ) { ins_pointer = 0; }
 	else { ins_pointer++; }
 	disp_ins_pointer.value =  ins_pointer;
+	ins_pointer_changed = 1;
+	ins_point_highlight();
 }
 
 /* update instruction pointer and set to new value */
@@ -244,6 +258,19 @@ function ins_point_modify_by_address(val)
 		return;
 	}
 	ins_pointer = disp_ins_pointer.value;
+	if(ins_pointer_last_address != ins_pointer) { ins_pointer_changed = 1; }
+	ins_point_highlight();
+}
+
+/* turns on and off data pointer highlight if it has changed this step */
+function ins_point_highlight()
+{
+	if(ins_pointer_changed) {
+		disp_ins_pointer.style.backgroundColor = "#ff0";
+		ins_pointer_changed = 0;
+	} else {
+		disp_ins_pointer.style.backgroundColor = "#fff";
+	}
 }
 
 /* setup virtual machine - must be called on page load */
@@ -453,6 +480,23 @@ function docs_select(page)
 	}
 }
 
+/*
+
+allows user to kick off example from the help menu.
+closes documentation menu, overwrites code with example.
+prints error message if something goes wrong.
+
+*/
+function docs_try(ex)
+{
+	var ans = confirm("This will delete code currently loaded in machine.");
+	if(!ans) { return; }
+	hide_docs();			/* close documentation window */
+	reset();				/* reset computer */
+	if(ex == null) { alert("Example not setup correctly."); return; }
+	disp_code.innerHTML = document.getElementById(ex).innerHTML;				/* write data out to code textarea */
+}
+
 </script>
 
 <style type="text/css">
@@ -556,7 +600,7 @@ body {
 	position: absolute;
 	top: 10px;
 	left: 10px;
-	width: 1000px;
+	width: 950px;
 	height:700px;
 	visibility: hidden;
 }
@@ -571,31 +615,28 @@ body {
 	height: 25px;
 	padding-top: 5px;
 	padding-left: 5px;
-	width: 995px;
+	width: 945px;
 }
 
 #docs_close_btn {
-	background-color: #f00;
-	border:3px solid #000;
+	background: #fff;
+	border:1px solid #000;
 	position: absolute;
 	top: 0px;
 	right: 0px;
-	height: 25px;
 	cursor: pointer;
+	padding: 6px;
 }
 
 #docs_mnu_btn {
 	border:2px solid #000;
-	background-color: #faa;
 	color: #000;
 	position: absolute;
 	top: 0px;
 	left: 375px;
-	height: 25px;
 	padding-top: 3px;
 	padding-left: 20px;
 	padding-right: 20px;
-	cursor: pointer;
 }
 
 #docs_content {
@@ -633,10 +674,27 @@ body {
 }
 
 #reference {
+	border-collapse: collapse;
+	border: 1px solid #ddd;
 	position: absolute;
 	top: 430px;
 	left: 625px;
 	width: 280px;
+}
+
+.ref_even td {
+	border-bottom: 1px solid #ddd;
+}
+
+.ref_odd td {
+	border-bottom: 1px solid #ddd;
+	background-color: #def;
+}
+
+.ref_ins {
+	font-size: 18px;
+	font-weight:bold;
+	color: #00f;
 }
 
 </style>
@@ -645,27 +703,27 @@ body {
 <center><h2>Turing Tarpit Simulator</h2></center>
 
 <center>
-<button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png"></button>
+<button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png" title="Restart" alt="Restart"></button>
 &nbsp;&nbsp;
-<button onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png"></button>
+<button onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png" title="Step Back" alt="Step Back"></button>
 &nbsp;&nbsp;
-<button onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png"></button>
+<button onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png" title="Next Step" alt="Next Step"></button>
 &nbsp;&nbsp;
-<button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png"></button>
+<button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png" title="Run" alt="Run"></button>
 &nbsp;&nbsp;
-<button onClick='halt();'><img src="http://opentextbook.info/icons/32x32/cancel.png"></button>
+<button onClick='halt();'><img src="http://opentextbook.info/icons/32x32/cancel.png" title="Halt Execution" alt="Halt Execution"></button>
 &nbsp;&nbsp;
-<button disabled><img src="http://opentextbook.info/icons/32x32/disk.png"></button>
+<button disabled><img src="http://opentextbook.info/icons/32x32/disk.png" title="Save Code" alt="Save Code"></button>
 &nbsp;&nbsp;
-<button onClick='display_docs();'><img src="http://opentextbook.info/icons/32x32/book_open.png"></button>
+<button onClick='display_docs();'><img src="http://opentextbook.info/icons/32x32/book_open.png" title="Open Documentation" alt="Open Documentation"></button>
 </center>
 
 <div id="code_buttons">
-<button id="dbg_status" onClick='debug_toggle_breakpoints();'>
+<button id="dbg_status" onClick='debug_toggle_breakpoints();'  title="Enable/Disable Breakpoints" alt="Enable/Disable Breakpoints">
 	<img src="http://opentextbook.info/icons/32x32/bug_add.png">
 </button>
 &nbsp;&nbsp;
-<button id="dbg_status" onClick='debug_remove_breakpoints();'>
+<button id="dbg_status" onClick='debug_remove_breakpoints();'  title="Remove Breakpoints" alt="Remove Breakpoints">
 	<img src="http://opentextbook.info/icons/32x32/bin.png">
 </button>
 </div>
@@ -674,20 +732,20 @@ body {
 <div id="input"><textarea id="code" rows="27" cols="38"></textarea></div>
 
 <div id="ip_banner">INSTRUCTION POINTER</div>
-<div id="instruction"><input  onBlur="ins_point_modify_by_address(disp_ins_pointer.value);" id="ins_pointer_disp" type="text" diabled value=0></div>
+<div id="instruction"><input onClick="select_all('ins_pointer_disp');" onBlur="ins_point_modify_by_address(disp_ins_pointer.value);" id="ins_pointer_disp" type="text" diabled value=0></div>
 
 <div id="da_banner">DATA POINTER</div>
-<div id="data"><input onBlur="dat_point_modify_by_address(disp_dat_pointer.value);" id="dat_pointer_disp" type="text" diabled value=0></div>
+<div id="data"><input  onClick="select_all('dat_pointer_disp');" onBlur="dat_point_modify_by_address(disp_dat_pointer.value);" id="dat_pointer_disp" type="text" diabled value=0></div>
 
 <div id="ref_banner">INSTRUCTION REFERENCE</div>
 <table id="reference">
-	<tr><td>+</td><td>increment byte at data pointer</td></tr>
-	<tr><td>-</td><td>decrement byte at data pointer</td></tr>
-	<tr><td>></td><td>increment data pointer</td></tr>
-	<tr><td><</td><td>decrement data pointer</td></tr>
-	<tr><td>.</td><td>print byte at data pointer</td></tr>
-	<tr><td>,</td><td>accept one byte of input</td></tr>
-	<tr><td>*</td><td>set breakpoint</td></tr>
+	<tr class="ref_even"><td class="ref_ins">+</td><td>increment byte at data pointer</td></tr>
+	<tr class="ref_odd" ><td class="ref_ins">-</td><td>decrement byte at data pointer</td></tr>
+	<tr class="ref_even"><td class="ref_ins">></td><td>increment data pointer</td></tr>
+	<tr class="ref_odd" ><td class="ref_ins"><</td><td>decrement data pointer</td></tr>
+	<tr class="ref_even"><td class="ref_ins">.</td><td>print byte at data pointer</td></tr>
+	<tr class="ref_odd" ><td class="ref_ins">,</td><td>accept one byte of input</td></tr>
+	<tr class="ref_even"><td class="ref_ins">*</td><td>set breakpoint</td></tr>
 </table>
 
 <div id="memory_banner">MEMORY</div>
@@ -699,8 +757,8 @@ body {
 <div id="docs">
 	<div id="docs_top_banner">
 		Turing Tarpit Simulator Documentation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<div id="docs_mnu_btn" onClick="docs_select('main');">Main Menu</div>
-		<div id="docs_close_btn" onClick="hide_docs();">X</div></div>
+		<button id="docs_mnu_btn" onClick="docs_select('main');"><img src="http://opentextbook.info/icons/16x16/house.png">Main Menu</button>
+		<div id="docs_close_btn" onClick="hide_docs();"><img src="http://opentextbook.info/icons/16x16/cross.png"></div></div>
 
 	<div id="docs_content"></div>
 </div>
@@ -755,32 +813,32 @@ Memory and pointers that have been modified are highlighted in yellow until the 
 <div id="docs_examples" class="docs_hidden">
 These are some examples of programs and snippets to get you started. Click the "Load" button to apply these to the Input of the simulator. (Please Note: You will erase the current program stored there.) Many of these examples can be found at Wikipedia.
 
-<p><b>Clear Byte:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_clear_btye');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Clear Byte:</b>
 Sets value at current Data Pointer to Zero.
 <div class=docs_code_ex>
 [-]
 </div>
-<p><b>Clear Previous Cells:</b>
+<p><button id="docs_try" onClick="docs_try('bad example');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Clear Previous Cells:</b>
 Sets value of all previous bytes including current byte to Zero.
 <div class=docs_code_ex>
 [[-]<]
 </div>
-<p><b>Rewind:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Rewind:</b>
 Goes back to byte Zero.
 <div class=docs_code_ex>
 [<]>
 </div>
-<p><b>Fast-forward:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Fast-forward:</b>
 Increments the data pointer until a 0 is found then decrements if until the current cell is non-zero.
 <div class=docs_code_ex>
 [>]<
 </div>
-<p><b>Simple Loop:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Simple Loop:</b>
 Accepts input from the user and echos it to the screen, similar to the UNIX cat program.
 <div class=docs_code_ex>
  ,[.,]
 </div>
-<p><b>Moving the Data Pointer:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Moving the Data Pointer:</b>
 Accepts input from the user and saves all input in the memory for future use.
 <div class=docs_code_ex>
  >,[.>,]
@@ -789,44 +847,61 @@ Accepts input from the user and saves all input in the memory for future use.
 
 
 <div id="docs_examples2" class="docs_hidden">
-<p><b>Add Two Bytes:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Add Two Bytes:</b>
 Adds current location to the next location and leaves behind a Zero for the first value.
 <div class=docs_code_ex>
 [->+<]
 </div>
-<p><b>Lower To Upper:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Lower To Upper:</b>
 Accepts lower case input from the user and makes it uppercase. Stops when user presses the enter key.
 <div class=docs_code_ex>
 ,----------[----------------------.,----------]
 </div>
-<p><b>Copy Value:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Copy Value:</b>
 Copy value of byte Zero to byte One.
 <div class=docs_code_ex>
 >[-]>[-]<<[->+>+<<]>>[-<<+>>]<<
 </div>
-<p><b>Seek:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Seek:</b>
 Move Data Pointer forward until it lands on a byte with a value of 1, preserving all bytes it passes.
 <div class=docs_code_ex>
 -[+>-]+
 </div>
-<p><b>Single Digit Add:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Add:</b>
 Adds two single digit numbers and display result. Works on one-digit results only.
 <div class=docs_code_ex>
 ,>++++++[<-------->-],[<+>-]<.
 </div>
-<p><b>Single Digit Multiplication:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Multiplication:</b>
 Multiply two single digit numbers and display result. Works on one-digit results only.
 <div class=docs_code_ex>
  ,>,>++++++++[<------<------>>-]
  <<[>[>+>+<<-]>>[<<+>>-]<<<-]
  >>>++++++[<++++++++>-]<.>.
 </div>
-<p><b>Single Digit Division:</b>
+<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Division:</b>
 Accepts two single-digit numbers from the user, divides them and displays the truncated quotient. Dividend is stored in byte Zero and Divisor is stored in byte One.
 <div class=docs_code_ex>
 ,>,>++++++[-<--------<-------->>]<<[>[->+>+<<]>[-<<-[>]>>>[<[>>>-<<<[-]]>>]<<]>>>+<<[-<<+>>]<<<]>[-]>>>>[-<<<<<+>>>>>]<<<<++++++[-<++++++++>]<.
 </div>
 </div>
+
+
+
+
+
+<div id="docs_example_clear_btye" class="docs_hidden">
+
+This is an example of clearing a byte
+
+update first byte to higher number
+++++++
+
+set this byte to zero regardless of current value
+[-]
+
+</div>
+
 </body>
 </html>
 
