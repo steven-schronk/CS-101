@@ -146,6 +146,7 @@ function exe_nxt_inst()
 			jump_bak();
 			break;
 		case ',':
+			get_byte();
 			break;
 		default:
   			/* must be a comment :) */
@@ -178,6 +179,14 @@ function jump_bak()
 		if(ins == '[') { jmp.pop();
 		} else if (ins == ']') { jmp.push(']'); }
 	}
+}
+
+/* get single byte of input from the user */
+function get_byte()
+{
+	var b = prompt("Please Single Byte of Data","");
+	alert(b);
+	ram_set(dat_pointer, b.charCodeAt(b));
 }
 
 /*
@@ -369,6 +378,22 @@ function ram_modify(address, change)
 	} else {
 		ram[address] = 0;
 	}
+	ram_highlight(address);
+	document.getElementById("ram_"+address).innerHTML = ram[address];
+	ram_last_address = address;
+}
+
+/* modify one byte of memory - set to address */
+function ram_set(address, val)
+{
+	if(address < 0 || address > 63) {
+		alert("SEGFAULT: Cannot Modify Data Outside of Memory Range");
+		halt = true;
+		reset();
+		return;
+	}
+
+	ram[address] = val;
 	ram_highlight(address);
 	document.getElementById("ram_"+address).innerHTML = ram[address];
 	ram_last_address = address;
