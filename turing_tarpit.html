@@ -185,7 +185,6 @@ function jump_bak()
 function get_byte()
 {
 	var b = prompt("Please Single Byte of Data","");
-	alert(b);
 	ram_set(dat_pointer, b.charCodeAt(b));
 }
 
@@ -808,17 +807,17 @@ body {
 
 <b>Basic Operation</b>
 
-<p>This Turing Tarpit is an abstract machine or a theoretical model of computer hardware.  The machine has 64 bytes of memory (RAM) and an almost unlimited amount of program storage (ROM). The instruction set is very simple. A user can program the tool by performing one of seven operations:
+<p>This Turing Tarpit is an abstract machine or a theoretical model of computer hardware.  The machine has 64 bytes of <b>MEMORY</b> (RAM) and an almost unlimited amount of program storage (ROM). The instruction set is very simple. A user can program the tool by performing one of seven operations:
 
-<p>The <b>'>'</b> and <b>'<'</b> symbols modify the Data Pointer to point to a new location in the Memory. It is possible to set the Data Pointer to a byte outside the machine's Memory. This does not cause an error. If you attempt to modify the memory at this location, the computer will crash and reboot with a SEGFAULT error.
+<p>The <b>'>'</b> and <b>'<'</b> symbols modify the <b>DATA POINTER</b> to point to a new location in the <b>MEMORY</b>. It is possible to set the <b>DATA POINTER</b> to a byte outside the machine's <b>MEMORY</b>. This does not cause an error. If you attempt to modify the <b>MEMORY</b> at this location, the computer will crash and reboot with a <b>SEGFAULT</b> error.
 
-<p>The <b>'+'</b> and <b>'-'</b> symbols allow the user to increment and decrement the Memory at the Data Pointer. Only one byte of Memory can be modified at any time. The byte of memory has a minimum and maximum value. When you exceed this value, the byte wraps around to zero.
+<p>The <b>'+'</b> and <b>'-'</b> symbols allow the user to increment and decrement the <b>MEMORY</b> at the <b>DATA POINTER</b>. Only one byte of <b>MEMORY</b> can be modified at any time. The byte of <b>MEMORY</b> has a minimum and maximum value. When you exceed this value, the byte wraps around to zero.
 
-<p>Another instruction <b>'.'</b> prints the contents of the byte at the Data Pointer. These numerical values listed in the Memory are converted into ASCII and printed as characters in the OUTPUT. A small chart of common ASCII values can be found in this documentation.
+<p>Another instruction <b>'.'</b> prints the contents of the byte at the <b>DATA POINTER</b>. These numerical values listed in the <b>MEMORY</b> are converted into ASCII and printed as characters in the <b>OUTPUT</b>. A small chart of common ASCII values can be found in this documentation.
 
 <p>The computer can interactively request data from the user with the <b>','</b> instruction. This opens up a dialog to request one byte of data from the user.
 
-<p>An additional instruction <b>'*'</b> halts the execution of the program to allow the user to examine the machine at that point.  This is known as a BREAKPOINT. These breakpoints can be toggled on and off as well as automatically deleted from the code with the user interface below the INPUT.
+<p>An additional instruction <b>'*'</b> halts the execution of the program to allow the user to examine the machine at that point.  This is known as a <b>BREAKPOINT</b>. These breakpoints can be toggled on and off as well as automatically deleted from the code with the user interface below the <b>INPUT</b>.
 
 <p>You can execute the program one step at a time or run the program at full speed until it needs user input or halts. Both methods are useful during development.
 
@@ -832,18 +831,18 @@ body {
 
 <p>All characters outside the Instruction Set are considered comments and will be skipped over during runtime.
 
-<p>While program executes, the Input cursor is moved over the current instruction.
+<p>While program executes, the <b>INPUT</b> cursor is moved over the current instruction.
 
-<p>User can change the address of the Data Pointer and Instruction Pointer at any time.
-Memory and pointers that have been modified are highlighted in yellow until the next step.
+<p>User can change the address of the <b>DATA POINTER</b> and Instruction Pointer at any time.
+<b>MEMORY</b> and pointers that have been modified are highlighted in yellow until the next step.
 
-<p>The Data Pointer can point to any location. If you de-reference a pointer out of memory range, a segfault error will occur. This causes the computer to reboot without warning.
+<p>The <b>DATA POINTER</b> can point to any location. If you de-reference a pointer out of <b>MEMORY</b> range, a <b>SEGFAULT</b> error will occur. This causes the computer to reboot without warning.
 
-<p>The Instruction Pointer can point to a location range of 1 to the number of characters in the input.
+<p>The Instruction Pointer can point to a location range of 1 to the number of characters in the <b>INPUT</b>.
 
-<p>Restarting the machine will reset all Memory, Data and Instruction Pointers to zero.
+<p>Restarting the machine will reset all <b>MEMORY</b>, Data and Instruction Pointers to zero.
 
-<p>The output of the program cannot be edited.
+<p>The <b>OUTPUT</b> of the program cannot be edited.
 
 <p>A user can add a break instruction in the code using an asterisk <b>'*'</b>. This will cause the machine to pause when in Run Mode. Breaks can be disabled and enabled with the debug button, and can be permanently deleted with the delete button.
 
@@ -863,37 +862,37 @@ Memory and pointers that have been modified are highlighted in yellow until the 
 
 
 <div id="docs_examples" class="docs_hidden">
-These are some examples of programs and snippets to get you started. Click the "Load" button to apply these to the Input of the simulator. (Please Note: You will erase the current program stored there.) Many of these examples can be found at Wikipedia.
+These are some examples of programs and snippets to get you started. Click the "Load" button to apply these to the <b>INPUT</b> of the simulator. (Please Note: You will erase the current program stored there.) Many of these examples can be found at Wikipedia.
 
 <p><button id="docs_try" onClick="docs_try('docs_example_clear_btye');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Clear Byte:</b>
-Sets value at current Data Pointer to Zero.
+Sets value at current <b>DATA POINTER</b> to Zero.
 <div class=docs_code_ex>
 [-]
 </div>
-<p><button id="docs_try" onClick="docs_try('bad example');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Clear Previous Cells:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_clear_prev');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Clear Previous Cells:</b>
 Sets value of all previous bytes including current byte to Zero.
 <div class=docs_code_ex>
 [[-]<]
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Rewind:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_rewind');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Rewind:</b>
 Goes back to byte Zero.
 <div class=docs_code_ex>
 [<]>
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Fast-forward:</b>
-Increments the data pointer until a 0 is found then decrements if until the current cell is non-zero.
+<p><button id="docs_try" onClick="docs_try('docs_example_fastforward');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Fast-forward:</b>
+Increments the <b>DATA POINTER</b> until a 0 is found then decrements it until the current byte is non-zero.
 <div class=docs_code_ex>
 [>]<
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Simple Loop:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_cat');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Simple Loop:</b>
 Accepts input from the user and echos it to the screen, similar to the UNIX cat program.
 <div class=docs_code_ex>
- ,[.,]
+,[.,]
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Moving the Data Pointer:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_data_save');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Moving the <b>DATA POINTER</b>:</b>
 Accepts input from the user and saves all input in the memory for future use.
 <div class=docs_code_ex>
- >,[.>,]
+>,[.>,]
 </div>
 </div>
 
@@ -902,39 +901,39 @@ Accepts input from the user and saves all input in the memory for future use.
 
 
 <div id="docs_examples2" class="docs_hidden">
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Add Two Bytes:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_add');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Add Two Bytes:</b>
 Adds current location to the next location and leaves behind a Zero for the first value.
 <div class=docs_code_ex>
 [->+<]
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Lower To Upper:</b>
-Accepts lower case input from the user and makes it uppercase. Stops when user presses the enter key.
+<p><button id="docs_try" onClick="docs_try('docs_example_uc');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Lower To Upper:</b>
+Accepts lower case input from the user and makes it uppercase. Stops when user clicks Cancel.
 <div class=docs_code_ex>
 ,----------[----------------------.,----------]
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Copy Value:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_copy_byte');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Copy Value:</b>
 Copy value of byte Zero to byte One.
 <div class=docs_code_ex>
 >[-]>[-]<<[->+>+<<]>>[-<<+>>]<<
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Seek:</b>
-Move Data Pointer forward until it lands on a byte with a value of 1, preserving all bytes it passes.
+<p><button id="docs_try" onClick="docs_try('docs_example_seek');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Seek:</b>
+Move <b>DATA POINTER</b> forward until it lands on a byte with a value of 1, preserving all bytes it passes.
 <div class=docs_code_ex>
 -[+>-]+
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Add:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_add_two');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Add:</b>
 Adds two single digit numbers and display result. Works on one-digit results only.
 <div class=docs_code_ex>
 ,>++++++[<-------->-],[<+>-]<.
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Multiplication:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_multiply');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Multiplication:</b>
 Multiply two single digit numbers and display result. Works on one-digit results only.
 <div class=docs_code_ex>
  ,>,>++++++++[<------<------>>-]
  <<[>[>+>+<<-]>>[<<+>>-]<<<-]
  >>>++++++[<++++++++>-]<.>.
 </div>
-<p><button id="docs_try" onClick="docs_try();"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Division:</b>
+<p><button id="docs_try" onClick="docs_try('docs_example_divide');"><img src="http://opentextbook.info/icons/16x16/bricks.png">Try</button><b>Single Digit Division:</b>
 Accepts two single-digit numbers from the user, divides them and displays the truncated quotient. Dividend is stored in byte Zero and Divisor is stored in byte One.
 <div class=docs_code_ex>
 ,>,>++++++[-<--------<-------->>]<<[>[->+>+<<]>[-<<-[>]>>>[<[>>>-<<<[-]]>>]<<]>>>+<<[-<<+>>]<<<]>[-]>>>>[-<<<<<+>>>>>]<<<<++++++[-<++++++++>]<.
@@ -949,13 +948,198 @@ Accepts two single-digit numbers from the user, divides them and displays the tr
 
 This is an example of clearing a byte
 
-update first byte to higher number
-++++++
+Update first byte to higher number and break
 
-set this byte to zero regardless of current value
-[-]
+++++++*
+
+Set this byte to zero regardless of current value
+
+[-]*
+
+Notice the Memory 0 location is now set to Zero
+</div>
+
+
+
+
+
+<div id="docs_example_clear_prev" class="docs_hidden">
+
+This example clears the current and all previous bytes to Zero
+
+Set a few bytes to Non Zero values
+
+>+++++
+>+++++
+>+
+>++++
+>++++++*
+
+Set all bytes from current back to Zero
+
+[[-]<]*
+</div>
+
+
+
+<div id="docs_example_rewind" class="docs_hidden">
+
+Often you need to return the Data Pointer to Zero
+
+Set a few bytes to Non Zero values and Move Data Pointer
+
+>+++++
+>+++++
+>+
+>++++
+>++++++*
+
+Find Data Pointer Zero
+
+[<]*
+</div>
+
+
+
+<div id="docs_example_fastforward" class="docs_hidden">
+
+Increments the Data Pointer until a 0 is found then decrements if until the current cell is non-zero
+
+Set a few bytes to Non Zero values and Move Data Pointer
+
+>+++++
+>+++++
+>+
+>++++
+>++++++*
+
+Move Data Pointer back to Zero
+
+<<<<*
+
+[>]<*
+</div>
+
+<div id="docs_example_cat" class="docs_hidden">
+
+Accepts input from the user and echos it to the screen
+
+Click "Cancel" to Exit Program
+
+,[.,]
+</div>
+
+<div id="docs_example_data_save" class="docs_hidden">
+
+Accepts input from the user and saves in memory for future use
+
+>,[.>,]
+</div>
+
+<div id="docs_example_add" class="docs_hidden">
+Adds current location to the next location and leaves behind a Zero for the first value
+
+Two
+
+++*
+
+Plus Two
+
+>++*
+
+Move Data Pointer to first value
+
+<*
+
+Equals Four
+
+[->+<]*
+</div>
+
+
+<div id="docs_example_uc" class="docs_hidden">
+
+Accepts lower case input from the user and makes it uppercase
+
+ Stops when user clicks Cancel
+
+,----------[----------------------.,----------]
+</div>
+
+<div id="docs_example_copy_byte" class="docs_hidden">
+
+Set byte Zero
+
++++*
+
+Set byte One
+
+>++*
+
+Move back to byte Zero
+
+<*
+
+Copy value of byte Zero to byte One
+
+>[-]>[-]<<[->+>+<<]>>[-<<+>>]<<*
+</div>
+
+
+<div id="docs_example_seek" class="docs_hidden">
+
+Set a few bytes to Non Zero values and Move Data Pointer
+
+++
+>+++++
+>+++++
+>+
+>++++
+>++++++*
+
+Move DATA POINTER back to byte Zero
+
+<<<<<*
+
+Move DATA POINTER forward until it lands on a byte with a value of 1 preserving all bytes it passes
+
+-[+>-]+*
+</div>
+
+
+<div id="docs_example_add_two" class="docs_hidden">
+
+Adds two single digit numbers and display result
+
+Works on one digit results only
+
+,>++++++[<-------->-],[<+>-]<.
 
 </div>
+
+
+<div id="docs_example_multiply" class="docs_hidden">
+
+Multiply two single digit numbers and display result
+
+Works on one digit results only
+
+ ,>,>++++++++[<------<------>>-]
+ <<[>[>+>+<<-]>>[<<+>>-]<<<-]
+ >>>++++++[<++++++++>-]<.>.*
+</div>
+
+<div id="docs_example_divide" class="docs_hidden">
+
+Accepts two single digit numbers from the user divides them and displays the truncated quotient
+
+Dividend is stored in byte Zero and Divisor is stored in byte One
+
+,>,>++++++[-<--------<-------->>]<<[>[->+>+<<]>[-<<-[>]>>>[<[>>>-<<<[-]]>>]<<]>>>+<<[-<<+>>]<<<]>[-]>>>>[-<<<<<+>>>>>]<<<<++++++[-<++++++++>]<.*
+</div>
+
+
+
 
 <div id="docs_ascii" class="docs_hidden">
 
