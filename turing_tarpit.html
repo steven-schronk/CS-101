@@ -208,6 +208,7 @@ function stop()
 function run()
 {
 	var total_steps = document.getElementById("code").value.length;
+	halt = false; /* seems weird, but this is the only way to make the halt work */
 	while(ins_pointer <= total_steps && halt == false) { step_next(); }
 }
 
