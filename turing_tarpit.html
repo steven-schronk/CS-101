@@ -519,7 +519,7 @@ function docs_try(ex)
 	var ans = confirm("This will delete code currently loaded in machine.");
 	if(!ans) { return; }
 	hide_docs();			/* close documentation window */
-	reset();				/* reset computer */
+	reset();			/* reset computer */
 	if(ex == null) { alert("Example not setup correctly."); return; }
 	disp_code.innerHTML = document.getElementById(ex).innerHTML;				/* write data out to code textarea */
 }
@@ -712,6 +712,20 @@ body {
 	top: 430px;
 	left: 625px;
 	width: 280px;
+}
+
+#ascii {
+	text-align: center;
+}
+
+#val_col {
+	border-right: 1px solid #ddd;
+	width: 10px;
+	padding-right: 15px;
+}
+
+#dat_col {
+	width: 100px;
 }
 
 .ref_even td {
@@ -1143,40 +1157,311 @@ Dividend is stored in byte Zero and Divisor is stored in byte One
 
 <div id="docs_ascii" class="docs_hidden">
 
-<table id="ascii" width="900px">
+<table id="ascii">
 <caption><b>ASCII Chart</b></caption>
-<tr><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th><th class="val_col"></th><th class="dat_col"></th></tr>
 
-<tr class="ref_even"><td>0</td><td class="ctrl">NUL</td><td>16</td><td class="ctrl">DLE</td><td>32</td><td class="ctrl">SP</td><td>48</td><td>0</td><td>64</td><td>@</td><td>80</td><td>P</td><td>96</td><td>`</td><td>112</td><td>p</td></tr>
+<tr class="ref_even">
+	<td id="dat_col">0</td>
+	<td class="ctrl" id="val_col">NUL</td>
+	<td id="dat_col">16</td>
+	<td class="ctrl" id="val_col">DLE</td>
+	<td id="dat_col">32</td>
+	<td class="ctrl" id="val_col">SP</td>
+	<td id="dat_col">48</td>
+	<td id="val_col">0</td>
+	<td id="dat_col">64</td>
+	<td id="val_col">@</td>
+	<td id="dat_col">80</td>
+	<td id="val_col">P</td>
+	<td id="dat_col">96</td>
+	<td id="val_col">`</td>
+	<td id="dat_col">112</td>
+	<td>p</td>
+</tr>
 
-<tr class="ref_odd"><td>1</td><td class="ctrl">SOH</td><td>17</td><td class="ctrl">DC1</td><td>33</td><td>!</td><td>49</td><td>1</td><td>65</td><td>A</td><td>81</td><td>Q</td><td>97</td><td>a</td><td>113</td><td>q</td></tr>
+<tr class="ref_odd">
+	<td>1</td>
+	<td class="ctrl" id="val_col">SOH</td>
+	<td>17</td>
+	<td class="ctrl" id="val_col">DC1</td>
+	<td>33</td>
+	<td id="val_col">!</td>
+	<td>49</td>
+	<td id="val_col">1</td>
+	<td>65</td>
+	<td id="val_col">A</td>
+	<td>81</td>
+	<td id="val_col">Q</td>
+	<td>97</td>
+	<td id="val_col">a</td>
+	<td>113</td>
+	<td>q</td>
+</tr>
 
-<tr class="ref_even"><td>2</td><td class="ctrl">STX</td><td>18</td><td class="ctrl">DC2</td><td>34</td><td>"</td><td>50</td><td>2</td><td>66</td><td>B</td><td>82</td><td>R</td><td>98</td><td>b</td><td>114</td><td>r</td></tr>
+<tr class="ref_even">
+	<td>2</td>
+	<td class="ctrl" id="val_col">STX</td>
+	<td>18</td>
+	<td class="ctrl" id="val_col">DC2</td>
+	<td>34</td>
+	<td id="val_col">"</td>
+	<td>50</td>
+	<td id="val_col">2</td>
+	<td>66</td>
+	<td id="val_col">B</td>
+	<td>82</td>
+	<td id="val_col">R</td>
+	<td>98</td>
+	<td id="val_col">b</td>
+	<td>114</td>
+	<td>r</td>
+</tr>
 
-<tr class="ref_odd"><td>3</td><td class="ctrl">ETX</td><td>19</td><td class="ctrl">DC3</td><td>35</td><td>#</td><td>51</td><td>3</td><td>67</td><td>C</td><td>83</td><td>S</td><td>99</td><td>c</td><td>115</td><td>s</td></tr>
+<tr class="ref_odd">
+	<td>3</td>
+	<td class="ctrl" id="val_col">ETX</td>
+	<td>19</td>
+	<td class="ctrl" id="val_col">DC3</td>
+	<td>35</td>
+	<td id="val_col">#</td>
+	<td>51</td>
+	<td id="val_col">3</td>
+	<td>67</td>
+	<td id="val_col">C</td>
+	<td>83</td>
+	<td id="val_col">S</td>
+	<td>99</td>
+	<td id="val_col">c</td>
+	<td>115</td>
+	<td>s</td>
+</tr>
 
-<tr class="ref_even"><td>4</td><td class="ctrl">EOT</td><td>20</td><td class="ctrl">DC4</td><td>36</td><td>$</td><td>52</td><td>4</td><td>68</td><td>D</td><td>84</td><td>T</td><td>100</td><td>d</td><td>116</td><td>t</td></tr>
+<tr class="ref_even">
+	<td>4</td>
+	<td class="ctrl" id="val_col">EOT</td>
+	<td>20</td>
+	<td class="ctrl" id="val_col">DC4</td>
+	<td>36</td>
+	<td id="val_col">$</td>
+	<td>52</td>
+	<td id="val_col">4</td>
+	<td>68</td>
+	<td id="val_col">D</td>
+	<td>84</td>
+	<td id="val_col">T</td>
+	<td>100</td>
+	<td id="val_col">d</td>
+	<td>116</td>
+	<td>t</td>
+</tr>
 
-<tr class="ref_odd"><td>5</td><td class="ctrl">ENQ</td><td>21</td><td class="ctrl">NAK</td><td>37</td><td>%</td><td>53</td><td>5</td><td>69</td><td>E</td><td>85</td><td>U</td><td>101</td><td>e</td><td>117</td><td>u</td></tr>
+<tr class="ref_odd">
+	<td>5</td>
+	<td class="ctrl" id="val_col">ENQ</td>
+	<td>21</td>
+	<td class="ctrl" id="val_col">NAK</td>
+	<td>37</td>
+	<td id="val_col">%</td>
+	<td>53</td>
+	<td id="val_col">5</td>
+	<td>69</td>
+	<td id="val_col">E</td>
+	<td>85</td>
+	<td id="val_col">U</td>
+	<td>101</td>
+	<td id="val_col">e</td>
+	<td>117</td>
+	<td>u</td>
+</tr>
 
-<tr class="ref_even"><td>6</td><td class="ctrl">ACK</td><td>22</td><td class="ctrl">SYN</td><td>38</td><td>&amp;</td><td>54</td><td>6</td><td>70</td><td>F</td><td>86</td><td>V</td><td>102</td><td>f</td><td>118</td><td>v</td></tr>
-<tr class="ref_odd"><td>7</td><td class="ctrl">BEL</td><td>23</td><td class="ctrl">ETB</td><td>39</td><td>'</td><td>55</td><td>7</td><td>71</td><td>G</td><td>87</td><td>W</td><td>103</td><td>g</td><td>119</td><td>w</td></tr>
+<tr class="ref_even">
+	<td>6</td>
+	<td class="ctrl" id="val_col">ACK</td>
+	<td>22</td><td class="ctrl" id="val_col">SYN</td>
+	<td>38</td>
+	<td id="val_col">&amp;</td>
+	<td>54</td>
+	<td id="val_col">6</td>
+	<td>70</td>
+	<td id="val_col">F</td>
+	<td>86</td>
+	<td id="val_col">V</td>
+	<td>102</td>
+	<td id="val_col">f</td>
+	<td>118</td>
+	<td>v</td>
+</tr>
 
-<tr class="ref_even"><td>8</td><td class="ctrl">BS</td><td>24</td><td class="ctrl">CAN</td><td>40</td><td>(</td><td>56</td><td>8</td><td>72</td><td>H</td><td>88</td><td>X</td><td>104</td><td>h</td><td>120</td><td>x</td></tr>
+<tr class="ref_odd">
+	<td>7</td>
+	<td class="ctrl" id="val_col">BEL</td>
+	<td>23</td>
+	<td class="ctrl" id="val_col">ETB</td>
+	<td>39</td>
+	<td id="val_col">'</td>
+	<td>55</td>
+	<td id="val_col">7</td>
+	<td>71</td>
+	<td id="val_col">G</td>
+	<td>87</td>
+	<td id="val_col">W</td>
+	<td>103</td>
+	<td id="val_col">g</td>
+	<td>119</td>
+	<td>w</td>
+</tr>
 
-<tr class="ref_odd"><td>9</td><td class="ctrl">HT</td><td>25</td><td class="ctrl">EM</td><td>41</td><td>)</td><td>57</td><td>9</td><td>73</td><td>I</td><td>89</td><td>Y</td><td>105</td><td>i</td><td>121</td><td>y</td></tr>
+<tr class="ref_even">
+	<td>8</td>
+	<td class="ctrl" id="val_col">BS</td>
+	<td>24</td>
+	<td class="ctrl" id="val_col">CAN</td>
+	<td>40</td>
+	<td id="val_col">(</td>
+	<td>56</td>
+	<td id="val_col">8</td>
+	<td>72</td>
+	<td id="val_col">H</td>
+	<td>88</td>
+	<td id="val_col">X</td>
+	<td>104</td>
+	<td id="val_col">h</td>
+	<td>120</td>
+	<td>x</td>
+</tr>
 
-<tr class="ref_even"><td>10</td><td class="ctrl">LF</td><td>26</td><td class="ctrl">SUB</td><td>42</td><td>*</td><td>58</td><td>:</td><td>74</td><td>J</td><td>90</td><td>Z</td><td>106</td><td>j</td><td>122</td><td>z</td></tr>
+<tr class="ref_odd">
+	<td>9</td>
+	<td class="ctrl" id="val_col">HT</td>
+	<td>25</td>
+	<td class="ctrl" id="val_col">EM</td>
+	<td>41</td>
+	<td id="val_col">)</td>
+	<td>57</td>
+	<td id="val_col">9</td>
+	<td>73</td>
+	<td id="val_col">I</td>
+	<td>89</td>
+	<td id="val_col">Y</td>
+	<td>105</td>
+	<td id="val_col">i</td>
+	<td>121</td>
+	<td>y</td>
+</tr>
 
-<tr class="ref_odd"><td>11</td><td class="ctrl">VT</td><td>27</td><td class="ctrl">ESC</td><td>43</td><td>+</td><td>59</td><td>;</td><td>75</td><td>K</td><td>91</td><td>[</td><td>107</td><td>k</td><td>123</td><td>{</td></tr>
+<tr class="ref_even">
+	<td>10</td>
+	<td class="ctrl" id="val_col">LF</td>
+	<td>26</td>
+	<td class="ctrl" id="val_col">SUB</td>
+	<td>42</td>
+	<td id="val_col">*</td>
+	<td>58</td>
+	<td id="val_col">:</td>
+	<td>74</td>
+	<td id="val_col">J</td>
+	<td>90</td>
+	<td id="val_col">Z</td>
+	<td>106</td>
+	<td id="val_col">j</td>
+	<td>122</td>
+	<td>z</td>
+</tr>
 
-<tr class="ref_even"><td>12</td><td class="ctrl">FF</td><td>28</td><td class="ctrl">FS</td><td>44</td><td>,</td><td>60</td><td>&lt;</td><td>76</td><td>L</td><td>92</td><td>\</td><td>108</td><td>l</td><td>124</td><td>|</td></tr>
-<tr class="ref_odd"><td>13</td><td class="ctrl">CR</td><td>29</td><td class="ctrl">GS</td><td>45</td><td>-</td><td>61</td><td>=</td><td>77</td><td>M</td><td>93</td><td>]</td><td>109</td><td>m</td><td>125</td><td>}</td></tr>
+<tr class="ref_odd">
+	<td>11</td>
+	<td class="ctrl" id="val_col">VT</td>
+	<td>27</td>
+	<td class="ctrl" id="val_col">ESC</td>
+	<td>43</td>
+	<td id="val_col">+</td>
+	<td>59</td>
+	<td id="val_col">;</td>
+	<td>75</td>
+	<td id="val_col">K</td>
+	<td>91</td>
+	<td id="val_col">[</td>
+	<td>107</td>
+	<td id="val_col">k</td>
+	<td>123</td>
+	<td>{</td>
+</tr>
 
-<tr class="ref_even"><td>14</td><td class="ctrl">SO</td><td>30</td><td class="ctrl">RS</td><td>46</td><td>.</td><td>62</td><td>></td><td>78</td><td>N</td><td>94</td><td>^</td><td>110</td><td>n</td><td>126</td><td>~</td></tr>
+<tr class="ref_even">
+	<td>12</td>
+	<td class="ctrl" id="val_col">FF</td>
+	<td>28</td>
+	<td class="ctrl" id="val_col">FS</td>
+	<td>44</td>
+	<td id="val_col">,</td>
+	<td>60</td>
+	<td id="val_col">&lt;</td>
+	<td>76</td>
+	<td id="val_col">L</td>
+	<td>92</td>
+	<td id="val_col">\</td>
+	<td>108</td>
+	<td id="val_col">l</td>
+	<td>124</td>
+	<td>|</td>
+</tr>
 
-<tr class="ref_odd"><td>15</td><td class="ctrl">SI</td><td>31</td><td class="ctrl">US</td><td>47</td><td>/</td><td>63</td><td>?</td><td>79</td><td>O</td><td>95</td><td>_</td><td>111</td><td>o</td><td>127</td><td class="ctrl">DEL</td></tr>
+<tr class="ref_odd">
+	<td>13</td>
+	<td class="ctrl" id="val_col">CR</td>
+	<td>29</td>
+	<td class="ctrl" id="val_col">GS</td>
+	<td>45</td>
+	<td id="val_col">-</td>
+	<td>61</td>
+	<td id="val_col">=</td>
+	<td>77</td>
+	<td id="val_col">M</td>
+	<td>93</td>
+	<td id="val_col">]</td>
+	<td>109</td>
+	<td id="val_col">m</td>
+	<td>125</td>
+	<td>}</td>
+</tr>
 
+<tr class="ref_even">
+	<td>14</td>
+	<td class="ctrl" id="val_col">SO</td>
+	<td>30</td>
+	<td class="ctrl" id="val_col">RS</td>
+	<td>46</td>
+	<td id="val_col">.</td>
+	<td>62</td>
+	<td id="val_col">></td>
+	<td>78</td>
+	<td id="val_col">N</td>
+	<td>94</td>
+	<td id="val_col">^</td>
+	<td>110</td>
+	<td id="val_col">n</td>
+	<td>126</td>
+	<td>~</td>
+</tr>
+
+<tr class="ref_odd">
+	<td>15</td>
+	<td class="ctrl" id="val_col">SI</td>
+	<td>31</td>
+	<td class="ctrl" id="val_col">US</td>
+	<td>47</td>
+	<td id="val_col">/</td>
+	<td>63</td>
+	<td id="val_col">?</td>
+	<td>79</td>
+	<td id="val_col">O</td>
+	<td>95</td>
+	<td id="val_col">_</td>
+	<td>111</td>
+	<td id="val_col">o</td>
+	<td>127</td>
+	<td class="ctrl">DEL</td>
+</tr>
 </table>
 </div>
 
