@@ -1,0 +1,92 @@
+<html>
+<title>Digital Logic Simulator</title>
+<script>
+
+var grid_status = 1; 	/* boolean status of stage grid lines 	*/
+var grid_size = 20;		/* this is stored here for reference 	*/
+var canvas;				/* object id of canvas tag 				*/
+var ctx;				/* context of canvas					*/
+var item_selected = "gate_and" /* only one type of object can be drawn at a time */
+
+/* intial setup of page - must be called on page load */
+function init_form()
+{
+	/* initalize canvas element for use */
+	canvas = document.getElementById("stage");
+	ctx = canvas.getContext("2d");
+	/* get width and height of window and set stage (canvas) with it. */
+	canvas.height = window.innerHeight-125;
+	canvas.width = window.innerWidth - 45;
+	if(grid_status) {draw_grid(); }
+	
+	/* temporary */
+	draw_and_gate(0,0);
+}
+/* draw faint gridlines on stage - used as a guide for the user */
+function draw_grid()
+{
+	var x, y;
+	for(x = 0; x < window.innerWidth; x++)
+	{
+		
+	}
+}
+
+function draw_and_gate(x,y)
+{
+	//if(!x || !y) { alert("Coordinates Not Sent to Function"); return; }
+	ctx.beginPath();
+	//ctx.moveTo(75,50);
+	//ctx.lineTo(100,75);
+	//ctx.lineTo(100,25);
+	ctx.arc(75,75,35,0,Math.PI,false);
+	ctx.stroke();
+}
+
+/* user changes what type of gate will be drawn next */
+function change_selection(sel)
+{
+	var button = document.getElementById(sel);
+	if(!button) { alert("Cannot Find Selected Button"); return; }
+	/* enable old button */
+	document.getElementById(item_selected).disabled = false;
+	/* disable new button */
+	button.disabled = true;
+	/* set variable */
+	item_selected = sel;
+}
+
+</script>
+
+<style type="text/css">
+
+#stage {
+	border: solid 1px #000;
+}
+
+</style>
+<body onLoad="init_form();">
+
+<center><h2>Digital Logic Simulator</h2></center>
+<center>
+<button id="gate_and" onClick='change_selection("gate_and");' disabled >AND</button>
+&nbsp;&nbsp;
+<button id="gate_or"  onClick='change_selection("gate_or");'>OR</button>
+&nbsp;&nbsp;
+<button id="gate_not"  onClick='change_selection("gate_not");'>NOT</button>
+&nbsp;&nbsp;
+<button id="gate_nor"  onClick='change_selection("gate_nor");'>NOR</button>
+&nbsp;&nbsp;
+<button id="gate_xor"  onClick='change_selection("gate_xor");'>XOR</button>
+&nbsp;&nbsp;
+<button id="gate_connect"  onClick='change_selection("gate_connect");'>Connect</button>
+&nbsp;&nbsp;
+</center>
+
+<canvas id="stage" width="200" height="200">
+Your browser does not support HTML5 Canvas.
+</canvas>
+
+
+</body>
+</html>
