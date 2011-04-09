@@ -3,10 +3,16 @@
 <script>
 
 var grid_status = 1; 	/* boolean status of stage grid lines 	*/
-var grid_size = 20;		/* this is stored here for reference 	*/
+var grid_size = 60;		/* this is stored here for reference 	*/
 var canvas;				/* object id of canvas tag 				*/
 var ctx;				/* context of canvas					*/
 var item_selected = "gate_and" /* only one type of object can be drawn at a time */
+
+/* converts decimal degrees to radians */
+function deg_to_rad(deg)
+{
+	return (Math.PI/180)*deg;
+}
 
 /* intial setup of page - must be called on page load */
 function init_form()
@@ -21,26 +27,115 @@ function init_form()
 	
 	/* temporary */
 	draw_and_gate(0,0);
+	draw_not_gate(3,0);
+	draw_or_gate(6,0);
 }
+
 /* draw faint gridlines on stage - used as a guide for the user */
 function draw_grid()
 {
-	var x, y;
-	for(x = 0; x < window.innerWidth; x++)
+	var x, y; /* current x and y position */
+	var offset = 10; /* x and y maximum offset (far bottom or side of the window) */
+	ctx.strokeStyle = "#eee";
+	ctx.lineWidth = 1;
+	/* draw vertical lines */
+	for(x = grid_size, y = 0, offset = window.innerWidth; x < window.innerWidth; x = x + grid_size)
 	{
-		
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		ctx.lineTo(x,y+offset);
+		ctx.stroke();
+	}
+	/* draw horizontal lines */
+	for(x = 0, y = grid_size, offset = window.innerWidth; y < window.innerWidth; y = y + grid_size)
+	{
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		ctx.lineTo(x+offset,y);
+		ctx.stroke();
 	}
 }
 
 function draw_and_gate(x,y)
 {
-	//if(!x || !y) { alert("Coordinates Not Sent to Function"); return; }
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 30; /* width of square area of gate */
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
 	ctx.beginPath();
-	//ctx.moveTo(75,50);
-	//ctx.lineTo(100,75);
-	//ctx.lineTo(100,25);
-	ctx.arc(75,75,35,0,Math.PI,false);
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w, y);
+	ctx.arc( x+w, y+(h/2), (h/2), deg_to_rad(-90), deg_to_rad(90), false);
+	ctx.lineTo(x+w, y+h);
+	ctx.lineTo(x,y+h);
+	ctx.lineTo(x,y);
 	ctx.stroke();
+}
+
+function draw_not_gate(x,y)
+{
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 40; /* width of square area of gate */
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	ctx.lineJoin = 'bevel';
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
+	
+	/* triangle */
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w,y+(h/2));
+	ctx.lineTo(x,y+h);
+	ctx.lineTo(x,y);
+	ctx.stroke();
+
+	/* nose */
+	ctx.beginPath();
+	ctx.arc( x+w+6, y+(h/2),5, deg_to_rad(0), deg_to_rad(360), false);
+	ctx.stroke();
+}
+
+function draw_or_gate(x,y)
+{
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 40; /* width of square area of gate */
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	ctx.lineJoin = 'bevel';
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
+
+	
+	/* back curve - inputs */
+	//.arc(centerX, centerY, radius, startingAngle, endingAngle, antiClockwise);
+	ctx.beginPath();
+	ctx.arc(x, y +(h/2), h/2, deg_to_rad(-90), deg_to_rad(90), false);
+	ctx.stroke();
+	/* top line */
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w,y);
+	ctx.stroke();
+	/* top curve */
+	ctx.beginPath();
+	ctx.arc(x+w, y+(h/2), h/2, deg_to_rad(-90), deg_to_rad(0), false);
+	ctx.stroke();
+	/* bottom line */
+	ctx.beginPath();
+	ctx.moveTo(x,y+h);
+	ctx.lineTo(x+w,y+h);
+	ctx.stroke();	
+	/* bottom curve */
+	
 }
 
 /* user changes what type of gate will be drawn next */
