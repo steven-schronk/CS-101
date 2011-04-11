@@ -2,11 +2,11 @@
 <title>Digital Logic Simulator</title>
 <script>
 
-var grid_status = 1; 	/* boolean status of stage grid lines 	*/
-var grid_size = 60;		/* this is stored here for reference 	*/
-var canvas;				/* object id of canvas tag 				*/
-var ctx;				/* context of canvas					*/
-var item_selected = "gate_and" /* only one type of object can be drawn at a time */
+var grid_status = 1; 		/* boolean status of stage grid lines 			*/
+var grid_size = 50;		/* this is stored here for reference 			*/
+var canvas;			/* object id of canvas tag 				*/
+var ctx;			/* context of canvas					*/
+var item_selected = "gate_and" 	/* only one type of object can be drawn at a time 	*/
 
 /* converts decimal degrees to radians */
 function deg_to_rad(deg)
@@ -17,6 +17,7 @@ function deg_to_rad(deg)
 /* intial setup of page - must be called on page load */
 function init_form()
 {
+	var x; var y;
 	/* initalize canvas element for use */
 	canvas = document.getElementById("stage");
 	ctx = canvas.getContext("2d");
@@ -24,11 +25,101 @@ function init_form()
 	canvas.height = window.innerHeight-125;
 	canvas.width = window.innerWidth - 45;
 	if(grid_status) {draw_grid(); }
-	
 	/* temporary */
-	draw_and_gate(0,0);
-	draw_not_gate(3,0);
-	draw_or_gate(6,0);
+	draw_and_gate(1,0);
+	draw_not_gate(4,0);
+	draw_or_gate(7,0);
+	draw_nor_gate(11,0);
+	draw_xor_gate(1,3);
+	draw_nand_gate(4,3);
+	draw_clock(0,0,1);
+	draw_clock(0,1,0);
+
+	/* init inputs */
+	for(y = "A", x = 2; x < 9; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
+		draw_input(0,x, y);
+	}
+
+	/* init outputs */
+	for(x = 2; x < 9; x++) {
+		draw_output(10,x, x-1);
+	}
+}
+
+function draw_clock(x,y,phase)
+{
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	if(phase > 1 || phase < 0) { alert("Clock phase not sent"); return ; }
+	x = (x*grid_size) + (grid_size/2); /* offset from conrner of grid */
+	y = (y*grid_size) + (grid_size/2);
+	ctx.strokeStyle = "#f33";
+	ctx.lineWidth = 2;
+	ctx.moveTo(x,y);
+	ctx.beginPath();
+	ctx.arc(x,y,20, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.stroke();
+	ctx.font = "10pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText("CLK", x, y);
+	/* draw line over text */
+	if(phase == 0) {
+		ctx.strokeStyle = "#000";
+		ctx.moveTo(x,y);
+		ctx.beginPath();
+		ctx.lineTo(x-15,y-8);
+		ctx.lineTo(x+15,y-8);
+		ctx.stroke();
+	}
+}
+
+/* inputs have are represented by a character with a parameter v */
+function draw_input(x,y,v)
+{
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	x = (x*grid_size) + (grid_size/2); /* offset from corner of grid */
+	y = (y*grid_size) + (grid_size/2);
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 2;
+	ctx.moveTo(x,y);
+	ctx.beginPath();
+	ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.stroke();
+	ctx.font = "15pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(v, x, y);
+}
+
+function draw_output(x,y,v)
+{
+	var w = 30; /* width of box */
+	var tx = x; var ty = y;
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+
+	tx = x * grid_size + (grid_size / 2);
+	ty = y * grid_size + (grid_size / 2);
+	ctx.font = "15pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(v, tx, ty);
+
+	x = (x*grid_size) + (grid_size/5); /* offset from corner of grid */
+	y = (y*grid_size) + (grid_size/5);
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 2;
+	ctx.moveTo(x,y);
+	ctx.beginPath();
+	//ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.lineTo(x+w,y);
+	ctx.lineTo(x+w,y+w);
+	ctx.lineTo(x,y+w);
+	ctx.lineTo(x,y);
+	ctx.lineTo(x+w,y);
+	ctx.stroke();
 }
 
 /* draw faint gridlines on stage - used as a guide for the user */
@@ -36,7 +127,7 @@ function draw_grid()
 {
 	var x, y; /* current x and y position */
 	var offset = 10; /* x and y maximum offset (far bottom or side of the window) */
-	ctx.strokeStyle = "#eee";
+	ctx.strokeStyle = "#ccc";
 	ctx.lineWidth = 1;
 	/* draw vertical lines */
 	for(x = grid_size, y = 0, offset = window.innerWidth; x < window.innerWidth; x = x + grid_size)
@@ -59,7 +150,7 @@ function draw_grid()
 function draw_and_gate(x,y)
 {
 	var h = 50; /* height of  square of gate 	*/ 
-	var w = 30; /* width of square area of gate */
+	var w = 30; /* width of square area of gate 	*/
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
 	ctx.strokeStyle = "#11f";
@@ -76,10 +167,34 @@ function draw_and_gate(x,y)
 	ctx.stroke();
 }
 
+function draw_nand_gate(x,y)
+{
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 30; /* width of square area of gate 	*/
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w, y);
+	ctx.arc( x+w, y+(h/2), (h/2), deg_to_rad(-90), deg_to_rad(90), false);
+	ctx.lineTo(x+w, y+h);
+	ctx.lineTo(x,y+h);
+	ctx.lineTo(x,y);
+	ctx.stroke();
+	/* nose */
+	ctx.beginPath();
+	ctx.arc( x+(w*2), y+(h/2),5, deg_to_rad(0), deg_to_rad(360), false);
+	ctx.stroke();
+}
+
 function draw_not_gate(x,y)
 {
 	var h = 50; /* height of  square of gate 	*/ 
-	var w = 40; /* width of square area of gate */
+	var w = 40; /* width of square area of gate	*/
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
 	ctx.strokeStyle = "#11f";
@@ -105,7 +220,7 @@ function draw_not_gate(x,y)
 function draw_or_gate(x,y)
 {
 	var h = 50; /* height of  square of gate 	*/ 
-	var w = 40; /* width of square area of gate */
+	var w = 21; /* width of square area of gate 	*/
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
 	ctx.strokeStyle = "#11f";
@@ -113,12 +228,9 @@ function draw_or_gate(x,y)
 	ctx.lineJoin = 'bevel';
 	x = 10 + (grid_size*x); /* offset from conrner of grid */
 	y = 10 + (grid_size*y);
-
-	
 	/* back curve - inputs */
-	//.arc(centerX, centerY, radius, startingAngle, endingAngle, antiClockwise);
 	ctx.beginPath();
-	ctx.arc(x, y +(h/2), h/2, deg_to_rad(-90), deg_to_rad(90), false);
+	ctx.arc(x-(2*w), y +(h/2), h, deg_to_rad(-30), deg_to_rad(30), false);
 	ctx.stroke();
 	/* top line */
 	ctx.beginPath();
@@ -127,7 +239,7 @@ function draw_or_gate(x,y)
 	ctx.stroke();
 	/* top curve */
 	ctx.beginPath();
-	ctx.arc(x+w, y+(h/2), h/2, deg_to_rad(-90), deg_to_rad(0), false);
+	ctx.arc(x+w, y+h, h, deg_to_rad(-90), deg_to_rad(-30), false);
 	ctx.stroke();
 	/* bottom line */
 	ctx.beginPath();
@@ -135,7 +247,87 @@ function draw_or_gate(x,y)
 	ctx.lineTo(x+w,y+h);
 	ctx.stroke();	
 	/* bottom curve */
-	
+	ctx.beginPath();
+	ctx.arc(x+w, y, h, deg_to_rad(30), deg_to_rad(90), false);
+	ctx.stroke();
+}
+
+function draw_nor_gate(x,y)
+{
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 21; /* width of square area of gate 	*/
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	ctx.lineJoin = 'bevel';
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
+	/* back curve - inputs */
+	ctx.beginPath();
+	ctx.arc(x-(2*w), y +(h/2), h, deg_to_rad(-30), deg_to_rad(30), false);
+	ctx.stroke();
+	/* top line */
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w,y);
+	ctx.stroke();
+	/* top curve */
+	ctx.beginPath();
+	ctx.arc(x+w, y+h, h, deg_to_rad(-90), deg_to_rad(-30), false);
+	ctx.stroke();
+	/* bottom line */
+	ctx.beginPath();
+	ctx.moveTo(x,y+h);
+	ctx.lineTo(x+w,y+h);
+	ctx.stroke();	
+	/* bottom curve */
+	ctx.beginPath();
+	ctx.arc(x+w, y, h, deg_to_rad(30), deg_to_rad(90), false);
+	ctx.stroke();
+	/* nose */
+	ctx.beginPath();
+	ctx.arc(x+(w*3)+6, y+(h/2),5, deg_to_rad(0), deg_to_rad(360), false);
+	ctx.stroke();
+}
+
+function draw_xor_gate(x,y)
+{
+	var h = 50; /* height of  square of gate 	*/ 
+	var w = 21; /* width of square area of gate 	*/
+	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
+	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	ctx.strokeStyle = "#11f";
+	ctx.lineWidth = 3;
+	ctx.lineJoin = 'bevel';
+	x = 10 + (grid_size*x); /* offset from conrner of grid */
+	y = 10 + (grid_size*y);
+	/* back curve - inputs */
+	ctx.beginPath();
+	ctx.arc(x-(2*w), y +(h/2), h, deg_to_rad(-30), deg_to_rad(30), false);
+	ctx.stroke();
+	/* extra back curve - inputs */
+	ctx.beginPath();
+	ctx.arc(x-(2*w)-10, y +(h/2), h, deg_to_rad(-30), deg_to_rad(30), false);
+	ctx.stroke();
+	/* top line */
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+w,y);
+	ctx.stroke();
+	/* top curve */
+	ctx.beginPath();
+	ctx.arc(x+w, y+h, h, deg_to_rad(-90), deg_to_rad(-30), false);
+	ctx.stroke();
+	/* bottom line */
+	ctx.beginPath();
+	ctx.moveTo(x,y+h);
+	ctx.lineTo(x+w,y+h);
+	ctx.stroke();	
+	/* bottom curve */
+	ctx.beginPath();
+	ctx.arc(x+w, y, h, deg_to_rad(30), deg_to_rad(90), false);
+	ctx.stroke();
 }
 
 /* user changes what type of gate will be drawn next */
@@ -166,11 +358,13 @@ function change_selection(sel)
 <center>
 <button id="gate_and" onClick='change_selection("gate_and");' disabled >AND</button>
 &nbsp;&nbsp;
-<button id="gate_or"  onClick='change_selection("gate_or");'>OR</button>
+<button id="gate_nand"  onClick='change_selection("gate_nand");'>NAND</button>
+&nbsp;&nbsp;
+<button id="gate_nor"  onClick='change_selection("gate_nor");'>NOR</button>
 &nbsp;&nbsp;
 <button id="gate_not"  onClick='change_selection("gate_not");'>NOT</button>
 &nbsp;&nbsp;
-<button id="gate_nor"  onClick='change_selection("gate_nor");'>NOR</button>
+<button id="gate_or"  onClick='change_selection("gate_or");'>OR</button>
 &nbsp;&nbsp;
 <button id="gate_xor"  onClick='change_selection("gate_xor");'>XOR</button>
 &nbsp;&nbsp;

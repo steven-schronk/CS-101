@@ -1,5 +1,13 @@
 --------------------------DIGITAL LOGIC SIMULATOR------------------------------
 
+Globally set look and feel of gates, inputs and outputs.
+
+Add ability to pan (zoom?) stage.
+
+Save stage to cookie in browser.
+
+Align grid with gates.
+
 
 
 --------------------------TURING TARPIT SIMULATOR------------------------------
