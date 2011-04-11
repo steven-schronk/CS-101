@@ -7,11 +7,51 @@ var grid_size = 50;		/* this is stored here for reference 			*/
 var canvas;			/* object id of canvas tag 				*/
 var ctx;			/* context of canvas					*/
 var item_selected = "gate_and" 	/* only one type of object can be drawn at a time 	*/
+var color_on = "#f00";		/* color of objects in high state			*/
+var color_off = "#000";		/* color of objects in low state			*/
+
+var out = new Array();		/* output bits		 				*/
+
+/* create new output - only called during init phase */
+function output(value, xpos, ypos)
+{
+	this.val = value;
+	this.xpos = xpos;
+	this.ypos = ypos;
+}
+
+/* flip bit of specified output and redraw on screen */
+function output_flip(v)
+{
+	if(v == 'undefined') { alert("Cannot flip unknown value"); }
+	if(out[v].val == 0) { out[v].val = 1; } else { out[v].val = 0; }
+	// redraw output on screen
+	 draw_output_simple(v);
+}
+
+/* reset all outputs to zero and redraw on screen */
+function output_reset()
+{
+	for(var i = 0; i < 9; i++) {
+		out[i].val = 0;
+		// redraw outputs on screen
+		draw_output_simple(i);
+	}
+}
 
 /* converts decimal degrees to radians */
 function deg_to_rad(deg)
 {
 	return (Math.PI/180)*deg;
+}
+
+/* create all output data structures and draw inital values on screen */
+function init_outputs()
+{
+	for(var x = 0; x < 9; x++) {
+		out[x] = new output(0,15,x+2);
+		draw_output(15,x+2, x, 0);
+	}
 }
 
 /* intial setup of page - must be called on page load */
@@ -24,6 +64,7 @@ function init_form()
 	/* get width and height of window and set stage (canvas) with it. */
 	canvas.height = window.innerHeight-125;
 	canvas.width = window.innerWidth - 45;
+	init_outputs();
 	if(grid_status) {draw_grid(); }
 	/* temporary */
 	draw_and_gate(1,0);
@@ -38,11 +79,6 @@ function init_form()
 	/* init inputs */
 	for(y = "A", x = 2; x < 9; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
 		draw_input(0,x, y);
-	}
-
-	/* init outputs */
-	for(x = 2; x < 9; x++) {
-		draw_output(10,x, x-1);
 	}
 }
 
@@ -93,7 +129,14 @@ function draw_input(x,y,v)
 	ctx.fillText(v, x, y);
 }
 
-function draw_output(x,y,v)
+/* draw round output button.
+
+x = grid position on x axis.
+y = grid position on y axis.
+v = char to print inside button.
+s = state of output (on or off)
+*/
+function draw_output(x,y,v,s)
 {
 	var w = 30; /* width of box */
 	var tx = x; var ty = y;
@@ -102,24 +145,49 @@ function draw_output(x,y,v)
 
 	tx = x * grid_size + (grid_size / 2);
 	ty = y * grid_size + (grid_size / 2);
-	ctx.font = "15pt Arial";
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillText(v, tx, ty);
 
-	x = (x*grid_size) + (grid_size/5); /* offset from corner of grid */
-	y = (y*grid_size) + (grid_size/5);
-	ctx.strokeStyle = "#11f";
+	
+	x = (x * grid_size) + (grid_size / 5); /* offset from corner of grid */
+	y = (y * grid_size) + (grid_size / 5);
+
+	/* draw filled box around char */
+	if(s) { ctx.fillStyle = color_on } else { ctx.fillStyle = color_off; }
 	ctx.lineWidth = 2;
 	ctx.moveTo(x,y);
 	ctx.beginPath();
-	//ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.lineTo(x+w,y);
+	ctx.lineTo(x+w,y+w);
+	ctx.lineTo(x,y+w);
+	ctx.lineTo(x,y);
+	ctx.lineTo(x+w,y);
+	ctx.fill();
+
+	/* draw outline box around char */
+	if(s) { ctx.strokeStyle = color_off } else { ctx.strokeStyle = color_on; }
+	ctx.lineWidth = 2;
+	ctx.moveTo(x,y);
+	ctx.beginPath();
 	ctx.lineTo(x+w,y);
 	ctx.lineTo(x+w,y+w);
 	ctx.lineTo(x,y+w);
 	ctx.lineTo(x,y);
 	ctx.lineTo(x+w,y);
 	ctx.stroke();
+
+	/* draw char inside box */
+	if(s) { ctx.fillStyle = color_off; } else { ctx.fillStyle = color_on; }
+	ctx.font = "15pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(v, tx, ty);
+
+}
+
+/* simple version with auto lookup to data structure */
+function draw_output_simple(v)
+{
+	if(v == 'undefined') { alert("Cannot modify unknown output"); }
+	draw_output(out[v].xpos, out[v].ypos, v, out[v].val);
 }
 
 /* draw faint gridlines on stage - used as a guide for the user */
@@ -370,7 +438,11 @@ function change_selection(sel)
 &nbsp;&nbsp;
 <button id="gate_connect"  onClick='change_selection("gate_connect");'>Connect</button>
 &nbsp;&nbsp;
+<button id="gate_connect"  onClick='output_flip(2);'>Bit Flip</button>
 </center>
+
+
+
 
 <canvas id="stage" width="200" height="200">
 Your browser does not support HTML5 Canvas.
