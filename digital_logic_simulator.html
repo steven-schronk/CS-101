@@ -7,10 +7,16 @@ var grid_size = 50;		/* this is stored here for reference 			*/
 var canvas;			/* object id of canvas tag 				*/
 var ctx;			/* context of canvas					*/
 var item_selected = "gate_and" 	/* only one type of object can be drawn at a time 	*/
-var color_on = "#f00";		/* color of objects in high state			*/
-var color_off = "#000";		/* color of objects in low state			*/
 
-var out = new Array();		/* output bits		 				*/
+var color_on = "#fe0";		/* color of objects in high state			*/
+var color_on_hlt = "#f90";
+
+var color_off = "#bbb";		/* color of objects in low state			*/
+var color_off_hlt = "#ddd";
+
+var out  = new Array();		/* output bits		 				*/
+var input = new Array();	/* intput bits		 				*/
+var grid = new Array();		/* status of grid - all details stored here		*/
 
 /* create new output - only called during init phase */
 function output(value, xpos, ypos)
@@ -19,6 +25,25 @@ function output(value, xpos, ypos)
 	this.xpos = xpos;
 	this.ypos = ypos;
 }
+
+/* each square on grid has an associated block of data tied to it */
+function grid(type, xpos, ypos)
+{
+	this.type = type; 	/* type of entity @ location 			*/
+	this.value = value; 	/* many entities have a value associated 	*/
+	this.xpos = xpos;	/* horiz position on grid 			*/
+	this.ypos = ypos;	/* vertical position on grid 			*/
+}
+
+/* flip bit of specified input and redraw on screen */
+function input_flip(v)
+{
+	if(v == 'undefined') { alert("Cannot flip unknown value"); }
+	if(input[v].val == 0) { input[v].val = 1; } else { input[v].val = 0; }
+	// redraw output on screen
+	 draw_input_simple(v);
+}
+
 
 /* flip bit of specified output and redraw on screen */
 function output_flip(v)
@@ -48,9 +73,16 @@ function deg_to_rad(deg)
 /* create all output data structures and draw inital values on screen */
 function init_outputs()
 {
-	for(var x = 0; x < 9; x++) {
+	var x;
+
+	for(x = 0; x < 9; x++) {
 		out[x] = new output(0,15,x+2);
 		draw_output(15,x+2, x, 0);
+	}
+
+	for(y = "A", x = 0; x < 9; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
+		input[x] = new output(0,0,x+2);
+		draw_input(0,x+3, y);
 	}
 }
 
@@ -75,11 +107,6 @@ function init_form()
 	draw_nand_gate(4,3);
 	draw_clock(0,0,1);
 	draw_clock(0,1,0);
-
-	/* init inputs */
-	for(y = "A", x = 2; x < 9; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
-		draw_input(0,x, y);
-	}
 }
 
 function draw_clock(x,y,phase)
@@ -93,7 +120,7 @@ function draw_clock(x,y,phase)
 	ctx.lineWidth = 2;
 	ctx.moveTo(x,y);
 	ctx.beginPath();
-	ctx.arc(x,y,20, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
 	ctx.stroke();
 	ctx.font = "10pt Arial";
 	ctx.textAlign = "center";
@@ -104,32 +131,76 @@ function draw_clock(x,y,phase)
 		ctx.strokeStyle = "#000";
 		ctx.moveTo(x,y);
 		ctx.beginPath();
-		ctx.lineTo(x-15,y-8);
-		ctx.lineTo(x+15,y-8);
+		ctx.lineTo(x-8,y-8);
+		ctx.lineTo(x+8,y-8);
 		ctx.stroke();
 	}
 }
 
 /* inputs have are represented by a character with a parameter v */
-function draw_input(x,y,v)
+function draw_input(x,y,v,s)
 {
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
 	x = (x*grid_size) + (grid_size/2); /* offset from corner of grid */
 	y = (y*grid_size) + (grid_size/2);
-	ctx.strokeStyle = "#11f";
+	if(s) { ctx.strokeStyle = color_on_hlt } else { ctx.strokeStyle = color_off; }
+	if(s) { ctx.fillStyle = color_on } else { ctx.fillStyle = color_off_hlt; }
 	ctx.lineWidth = 2;
 	ctx.moveTo(x,y);
+	/* draw background circle */
+	ctx.beginPath();
+	ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
+	ctx.fill();
+
 	ctx.beginPath();
 	ctx.arc(x,y,15, deg_to_rad(360), deg_to_rad(0), false);
 	ctx.stroke();
+
+	if(s) { ctx.fillStyle = color_on_hlt } else { ctx.fillStyle = color_off; }
+	/* draw character on top */
 	ctx.font = "15pt Arial";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.fillText(v, x, y);
 }
 
-/* draw round output button.
+/* simple version with auto lookup to data structure */
+function draw_input_simple(v)
+{
+	var x;
+	if(v == 'undefined') { alert("Cannot modify unknown output"); }
+	// TODO: Make this work with lib function instead...
+	switch(v) {
+		case 1:
+			x = "A";
+			break;
+		case 2:
+			x = "B";
+			break;
+		case 3:
+			x = "C";
+			break;
+		case 4:
+			x = "D";
+			break;
+		case 5:
+			x = "E";
+			break;
+		case 6:
+			x = "F";
+			break;
+		case 7:
+			x = "G";
+			break;
+		case 8:
+			x = "H";
+			break;
+	};
+	draw_input(input[v].xpos, input[v].ypos, x, input[v].val);
+}
+
+/* draw output button.
 
 x = grid position on x axis.
 y = grid position on y axis.
@@ -151,7 +222,7 @@ function draw_output(x,y,v,s)
 	y = (y * grid_size) + (grid_size / 5);
 
 	/* draw filled box around char */
-	if(s) { ctx.fillStyle = color_on } else { ctx.fillStyle = color_off; }
+	if(s) { ctx.fillStyle = color_on } else { ctx.fillStyle = color_off_hlt; }
 	ctx.lineWidth = 2;
 	ctx.moveTo(x,y);
 	ctx.beginPath();
@@ -163,7 +234,7 @@ function draw_output(x,y,v,s)
 	ctx.fill();
 
 	/* draw outline box around char */
-	if(s) { ctx.strokeStyle = color_off } else { ctx.strokeStyle = color_on; }
+	if(s) { ctx.strokeStyle = color_on_hlt } else { ctx.strokeStyle = color_off; }
 	ctx.lineWidth = 2;
 	ctx.moveTo(x,y);
 	ctx.beginPath();
@@ -175,12 +246,11 @@ function draw_output(x,y,v,s)
 	ctx.stroke();
 
 	/* draw char inside box */
-	if(s) { ctx.fillStyle = color_off; } else { ctx.fillStyle = color_on; }
+	if(s) { ctx.fillStyle = color_on_hlt; } else { ctx.fillStyle = color_off; }
 	ctx.font = "15pt Arial";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
 	ctx.fillText(v, tx, ty);
-
 }
 
 /* simple version with auto lookup to data structure */
@@ -411,6 +481,33 @@ function change_selection(sel)
 	item_selected = sel;
 }
 
+/* returns coordinates of canvas in pixels */
+function cnvs_get_coordinates(e)
+{
+	var x_offset = canvas.offsetLeft;
+	var y_offset = canvas.offsetTop;
+	if(canvas == 'undefined') { alert("Canvas parameter is undefined"); }
+	x_offset = e.clientX - x_offset;
+	y_offset = e.clientY - y_offset;
+	document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x_offset + "," + y_offset + ")";
+	return [x_offset,y_offset];
+}
+
+/* canvas has been clicked find out which grid and make correct change to square if needed. */
+function cnvs_clicked(e)
+{
+	var coords = cnvs_get_coordinates(e);
+	var x_pos = Math.floor(coords[0] / grid_size);
+	var y_pos = Math.floor(coords[1] / grid_size);
+
+	alert(x_pos + " " + y_pos);
+
+	// if an input or output, flip value
+
+
+	// ...otherwise perform whatever the current selected function is
+}
+
 </script>
 
 <style type="text/css">
@@ -438,16 +535,16 @@ function change_selection(sel)
 &nbsp;&nbsp;
 <button id="gate_connect"  onClick='change_selection("gate_connect");'>Connect</button>
 &nbsp;&nbsp;
-<button id="gate_connect"  onClick='output_flip(2);'>Bit Flip</button>
+<button id="gate_connect"  onClick='input_flip(2);'>In Flip</button>
+&nbsp;&nbsp;
+<button id="gate_connect"  onClick='output_flip(2);'>Out Flip</button>
 </center>
 
+<div id=xycoordinates>&nbsp;</div>
 
-
-
-<canvas id="stage" width="200" height="200">
+<canvas id="stage" width="200" height="200" onMouseMove="cnvs_get_coordinates(event)" onClick="cnvs_clicked(event);">
 Your browser does not support HTML5 Canvas.
 </canvas>
-
 
 </body>
 </html>

@@ -1,5 +1,7 @@
 --------------------------DIGITAL LOGIC SIMULATOR------------------------------
 
+Universal data structure for grid with info about all entities.
+
 Globally set look and feel of gates, inputs and outputs.
 
 Add ability to pan (zoom?) stage.
