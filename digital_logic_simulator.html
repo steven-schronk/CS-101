@@ -1,38 +1,32 @@
 <html>
 <title>Digital Logic Simulator</title>
 <script>
-
-var grid_status = 1; 		/* boolean status of stage grid lines 			*/
-var grid_size = 50;		/* this is stored here for reference 			*/
-var canvas;			/* object id of canvas tag 				*/
-var ctx;			/* context of canvas					*/
-var item_selected = "gate_and" 	/* only one type of object can be drawn at a time 	*/
-
+/* DEFAULT COLOR SETTINGS */
 var color_on = "#fe0";		/* color of objects in high state			*/
 var color_on_hlt = "#f90";
 
 var color_off = "#bbb";		/* color of objects in low state			*/
 var color_off_hlt = "#ddd";
 
+/* GENERAL DATA STRUCTRURES */
+var stage = new Array();	/* status of stage - all details stored here		*/
+var stage_rows = 0;		/* number of rows on stage				*/
+var stage_cols = 0;		/* number of columns on stage				*/
+var grid_status = 1; 		/* boolean status of stage grid lines 			*/
+var grid_size = 50;		/* this is stored here for reference 			*/
+var canvas;			/* object id of canvas tag 				*/
+var ctx;			/* context of canvas					*/
+var item_selected = "gate_and" 	/* only one type of object can be drawn at a time 	*/
+
 var out  = new Array();		/* output bits		 				*/
 var input = new Array();	/* intput bits		 				*/
-var grid = new Array();		/* status of grid - all details stored here		*/
-
-/* create new output - only called during init phase */
-function output(value, xpos, ypos)
-{
-	this.val = value;
-	this.xpos = xpos;
-	this.ypos = ypos;
-}
 
 /* each square on grid has an associated block of data tied to it */
-function grid(type, xpos, ypos)
+function grid(type, value)
 {
 	this.type = type; 	/* type of entity @ location 			*/
 	this.value = value; 	/* many entities have a value associated 	*/
-	this.xpos = xpos;	/* horiz position on grid 			*/
-	this.ypos = ypos;	/* vertical position on grid 			*/
+	this.name = '';		/* used for inputs and outputs 			*/
 }
 
 /* flip bit of specified input and redraw on screen */
@@ -43,7 +37,6 @@ function input_flip(v)
 	// redraw output on screen
 	 draw_input_simple(v);
 }
-
 
 /* flip bit of specified output and redraw on screen */
 function output_flip(v)
@@ -71,19 +64,69 @@ function deg_to_rad(deg)
 }
 
 /* create all output data structures and draw inital values on screen */
-function init_outputs()
+function init_stage()
 {
-	var x;
+	var x; var y;
 
-	for(x = 0; x < 9; x++) {
-		out[x] = new output(0,15,x+2);
-		draw_output(15,x+2, x, 0);
+	/* create blank grid data structure */
+	for(x = 0; x < stage_cols; x++) {
+		stage[x] = new Array();
+		for(y = 0; y < stage_rows; y++) {
+			stage[x][y] = new grid('', '');
+		}
 	}
 
-	for(y = "A", x = 0; x < 9; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
-		input[x] = new output(0,0,x+2);
-		draw_input(0,x+3, y);
+	/* setup clocks */
+	stage[0][0].type = "clock";
+	stage[0][1].type = "clock_";
+
+	/* setup inputs */
+	for(x = 0; x < 5; x++) {
+		stage[15][x+3].type = "input";
+		stage[15][x+3].value = 0;
+		stage[15][x+3].name = x;
 	}
+
+	/* setup outputs */
+	for(y = "A", x = 0; x < 5; x++, y = String.fromCharCode(y.charCodeAt() + 1)) {
+		stage[0][x+3].type = "output";
+		stage[0][x+3].value = 0;
+		stage[0][x+3].name = y;
+	}
+}
+
+/*
+move through each grid in stage and draw contents.
+this function can be used to refresh the screen at any time.
+*/
+function draw_stage()
+{
+	var x; var y;
+	/* loop through all grids on stage, drawing contents */
+	for(x=0; x < stage_cols; x++) {
+		for(y = 0; y < stage_rows; y++) {
+			switch(stage[x][y].type) {
+				case "clock":
+					draw_clock(x,y,1);
+					break;
+				case "clock_":
+					draw_clock(x,y,0);
+					break;
+				case "input":
+					draw_input(x,y,x);
+					break;
+				case "output":
+					draw_output(x,y,x);
+					break;
+			};
+		}
+	}
+
+	/* draw lines (wires) connecting gates */
+	
+	/* update inputs */
+	
+	/* update outputs */
 }
 
 /* intial setup of page - must be called on page load */
@@ -96,17 +139,9 @@ function init_form()
 	/* get width and height of window and set stage (canvas) with it. */
 	canvas.height = window.innerHeight-125;
 	canvas.width = window.innerWidth - 45;
-	init_outputs();
 	if(grid_status) {draw_grid(); }
-	/* temporary */
-	draw_and_gate(1,0);
-	draw_not_gate(4,0);
-	draw_or_gate(7,0);
-	draw_nor_gate(11,0);
-	draw_xor_gate(1,3);
-	draw_nand_gate(4,3);
-	draw_clock(0,0,1);
-	draw_clock(0,1,0);
+	init_stage();
+	draw_stage();
 }
 
 function draw_clock(x,y,phase)
@@ -138,10 +173,12 @@ function draw_clock(x,y,phase)
 }
 
 /* inputs have are represented by a character with a parameter v */
-function draw_input(x,y,v,s)
+function draw_input(x,y)
 {
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
+	var s = stage[x][y].value;
+	var name = stage[x][y].name;
 	x = (x*grid_size) + (grid_size/2); /* offset from corner of grid */
 	y = (y*grid_size) + (grid_size/2);
 	if(s) { ctx.strokeStyle = color_on_hlt } else { ctx.strokeStyle = color_off; }
@@ -162,7 +199,7 @@ function draw_input(x,y,v,s)
 	ctx.font = "15pt Arial";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillText(v, x, y);
+	ctx.fillText(name, x, y);
 }
 
 /* simple version with auto lookup to data structure */
@@ -204,16 +241,15 @@ function draw_input_simple(v)
 
 x = grid position on x axis.
 y = grid position on y axis.
-v = char to print inside button.
-s = state of output (on or off)
 */
-function draw_output(x,y,v,s)
+function draw_output(x,y)
 {
 	var w = 30; /* width of box */
 	var tx = x; var ty = y;
 	if(x == 'undefined' || y == 'undefined') { alert("Coordinates Not Sent to Function"); return; }
 	if(x < 0 || y < 0) { alert("Coordinates Cannot Be Negative"); return ; }
-
+	var s = stage[x][y].value;
+	var name = stage[x][y].name;
 	tx = x * grid_size + (grid_size / 2);
 	ty = y * grid_size + (grid_size / 2);
 
@@ -250,7 +286,7 @@ function draw_output(x,y,v,s)
 	ctx.font = "15pt Arial";
 	ctx.textAlign = "center";
 	ctx.textBaseline = "middle";
-	ctx.fillText(v, tx, ty);
+	ctx.fillText(name, tx, ty);
 }
 
 /* simple version with auto lookup to data structure */
@@ -274,6 +310,7 @@ function draw_grid()
 		ctx.moveTo(x,y);
 		ctx.lineTo(x,y+offset);
 		ctx.stroke();
+		stage_cols++;
 	}
 	/* draw horizontal lines */
 	for(x = 0, y = grid_size, offset = window.innerWidth; y < window.innerWidth; y = y + grid_size)
@@ -282,6 +319,7 @@ function draw_grid()
 		ctx.moveTo(x,y);
 		ctx.lineTo(x+offset,y);
 		ctx.stroke();
+		stage_rows++;
 	}
 }
 
@@ -500,12 +538,38 @@ function cnvs_clicked(e)
 	var x_pos = Math.floor(coords[0] / grid_size);
 	var y_pos = Math.floor(coords[1] / grid_size);
 
-	alert(x_pos + " " + y_pos);
-
 	// if an input or output, flip value
 
 
 	// ...otherwise perform whatever the current selected function is
+	// check for presence of another item
+	if(stage[x_pos][y_pos].type != "") { return; }
+	switch(item_selected) {
+		case "gate_and":
+			stage[x_pos][y_pos].type = "and";
+			draw_and_gate(x_pos,y_pos);
+			break;
+		case "gate_nand":
+			stage[x_pos][y_pos].type = "nand";
+			draw_nand_gate(x_pos,y_pos);
+			break;
+		case "gate_nor":
+			stage[x_pos][y_pos].type = "nor";
+			draw_nor_gate(x_pos,y_pos);
+			break;
+		case "gate_not":
+			stage[x_pos][y_pos].type = "not";
+			draw_not_gate(x_pos,y_pos);
+			break;
+		case "gate_or":
+			stage[x_pos][y_pos].type = "or";
+			draw_or_gate(x_pos,y_pos);
+			break;
+		case "gate_xor":
+			stage[x_pos][y_pos].type = "xor";
+			draw_xor_gate(x_pos,y_pos);
+			break;
+	};
 }
 
 </script>
