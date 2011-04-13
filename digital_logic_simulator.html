@@ -93,6 +93,16 @@ function init_stage()
 		stage[0][x+3].value = 0;
 		stage[0][x+3].name = y;
 	}
+
+	/* reset all command buttons */
+	item_selected = "gate_and";
+	document.getElementById("gate_and").disabled = true;
+	document.getElementById("gate_nand").disabled = false;
+	document.getElementById("gate_nor").disabled = false;
+	document.getElementById("gate_not").disabled = false;
+	document.getElementById("gate_or").disabled = false;
+	document.getElementById("gate_xor").disabled = false;
+	document.getElementById("delete").disabled = false;
 }
 
 /*
@@ -513,6 +523,7 @@ function change_selection(sel)
 	if(!button) { alert("Cannot Find Selected Button"); return; }
 	/* enable old button */
 	document.getElementById(item_selected).disabled = false;
+	//alert("enabling " + item_selected);
 	/* disable new button */
 	button.disabled = true;
 	/* set variable */
@@ -537,13 +548,18 @@ function cnvs_clicked(e)
 	var coords = cnvs_get_coordinates(e);
 	var x_pos = Math.floor(coords[0] / grid_size);
 	var y_pos = Math.floor(coords[1] / grid_size);
+	// if delete command, remove contents of grid
+	if(item_selected == "delete") {
+		// cannot allow inputs and outputs to be deleted
+		if(stage[x_pos][y_pos].type == "input" || stage[x_pos][y_pos].type == "output") { return; }
+		stage[x_pos][y_pos].type = "";
+		draw_stage();
+	}
 
 	// if an input or output, flip value
 
-
 	// ...otherwise perform whatever the current selected function is
-	// check for presence of another item
-	if(stage[x_pos][y_pos].type != "") { return; }
+	if(stage[x_pos][y_pos].type != "") { return; } // check for presence of an item
 	switch(item_selected) {
 		case "gate_and":
 			stage[x_pos][y_pos].type = "and";
@@ -585,23 +601,25 @@ function cnvs_clicked(e)
 
 <center><h2>Digital Logic Simulator</h2></center>
 <center>
-<button id="gate_and" onClick='change_selection("gate_and");' disabled >AND</button>
+<button type="button" id="gate_and" onClick='change_selection("gate_and");' disabled="disabled">AND</button>
 &nbsp;&nbsp;
-<button id="gate_nand"  onClick='change_selection("gate_nand");'>NAND</button>
+<button type="button" id="gate_nand"  onClick='change_selection("gate_nand");'>NAND</button>
 &nbsp;&nbsp;
-<button id="gate_nor"  onClick='change_selection("gate_nor");'>NOR</button>
+<button type="button" id="gate_nor"  onClick='change_selection("gate_nor");'>NOR</button>
 &nbsp;&nbsp;
-<button id="gate_not"  onClick='change_selection("gate_not");'>NOT</button>
+<button type="button" id="gate_not"  onClick='change_selection("gate_not");'>NOT</button>
 &nbsp;&nbsp;
-<button id="gate_or"  onClick='change_selection("gate_or");'>OR</button>
+<button type="button" id="gate_or"  onClick='change_selection("gate_or");'>OR</button>
 &nbsp;&nbsp;
-<button id="gate_xor"  onClick='change_selection("gate_xor");'>XOR</button>
+<button type="button" id="gate_xor"  onClick='change_selection("gate_xor");'>XOR</button>
 &nbsp;&nbsp;
-<button id="gate_connect"  onClick='change_selection("gate_connect");'>Connect</button>
+<button type="button" id="delete"  onClick='change_selection("delete");'>Delete</button>
 &nbsp;&nbsp;
-<button id="gate_connect"  onClick='input_flip(2);'>In Flip</button>
+<button type="button" id="gate_connect"  onClick='change_selection("gate_connect");'>Connect</button>
 &nbsp;&nbsp;
-<button id="gate_connect"  onClick='output_flip(2);'>Out Flip</button>
+<button type="button" id="gate_connect"  onClick='input_flip(2);'>In Flip</button>
+&nbsp;&nbsp;
+<button type="button" id="gate_connect"  onClick='output_flip(2);'>Out Flip</button>
 </center>
 
 <div id=xycoordinates>&nbsp;</div>
