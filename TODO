@@ -12,6 +12,9 @@ Align grid with gates.
 
 Option to write gate names as a hint.
 
+Draw stage needs to completely re-draw all elements
+beginning with clearing current stage.
+
 
 
 --------------------------TURING TARPIT SIMULATOR------------------------------
