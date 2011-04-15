@@ -1,20 +1,21 @@
 --------------------------DIGITAL LOGIC SIMULATOR------------------------------
 
-Universal data structure for grid with info about all entities.
-
 Globally set look and feel of gates, inputs and outputs.
 
 Add ability to pan (zoom?) stage.
 
 Save stage to cookie in browser.
 
-Align grid with gates.
-
 Option to write gate names as a hint.
+
+Clock phase not drawn properly when clock running.
+
+Clock speed does not change until clock is restarted.
+
+Need central place for input and output values to be stored. Then draw based on this data.
 
 Draw stage needs to completely re-draw all elements
 beginning with clearing current stage.
-
 
 
 --------------------------TURING TARPIT SIMULATOR------------------------------
