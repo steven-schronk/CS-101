@@ -1,5 +1,8 @@
 <html>
 <title>Turing Tarpit Simulator</title>
+<noscript>
+	<b>Your browser does not support JavaScript or JavaScript is disabled.</b>
+</noscript>
 <script>
 
 /* internal values for simulated computer */
@@ -268,7 +271,9 @@ function ins_point_modify_by_address(val)
 	}
 	ins_pointer = disp_ins_pointer.value;
 	if(ins_pointer_last_address != ins_pointer) { ins_pointer_changed = 1; }
-	ins_point_highlight();
+	if(ins_pointer != val) {
+		ins_point_highlight();
+	}
 }
 
 /* turns on and off data pointer highlight if it has changed this step */
@@ -289,8 +294,8 @@ function init_form()
 	disp_ins_pointer = document.getElementById("ins_pointer_disp");
 	disp_dat_pointer = document.getElementById("dat_pointer_disp");
 	disp_ram = document.getElementById("ram_disp");
-	ram_reset();
 	ram_init();
+	ram_reset();	
 	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
 	disp_docs = document.getElementById("docs");
 	
@@ -303,13 +308,17 @@ function init_form()
 function ram_reset()
 {
 	var i;
-	for(i=0; i < 64; i++) { ram[i] = 0; }
+	for(i=0; i < 64; i++) {
+		ram[i] = 0;
+		document.getElementById("ram_"+i).value = ram[i];
+	}
 }
 
 /* update highlight of one memory address and release other highlight if needed */
 function ram_highlight(address)
 {
 	var disp_last_address = document.getElementById("ram_"+ram_last_address);
+	if(disp_last_address == 'undefined') { alert("Last address could not be found."); }
 	/* highlight background of current address */
 	document.getElementById("ram_"+address).style.backgroundColor = "#ff0";
 
@@ -349,10 +358,17 @@ function ram_init()
 		} else {
 			table += "\t<tr class=odd>";
 		}
-		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td><td width='35' class=ram id=ram_"+i+">"+ram[i]+"</td>";
-		table += "<td width='35' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td><td class=ram id=ram_"+(i+16)+">"+ram[i+16]+"</td>\n";
-		table += "<td class=addr id=addr_"+(i+32)+">"+(i+32)+"</td><td width='35' class=ram id=ram_"+(i+32)+">"+ram[i+32]+"</td>\n";
-		table += "<td class=addr id=addr_"+(i+48)+">"+(i+48)+"</td><td width='35' class=ram id=ram_"+(i+48)+">"+ram[i+48]+"</td></tr>\n";
+		table += "<td width='32' class=addr id=addr_"+i+">"+i+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+i+"');\" onBlur=\"ram_set("+i+", document.getElementById('ram_"+i+"').value);\" size='3' class=ram id=ram_"+i+" value="+ram[i]+"></td>";
+
+		table += "<td width='32' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+16)+"');\" onBlur=\"ram_set("+(i+16)+", document.getElementById('ram_"+(i+16)+"').value);\" size='3' class=ram id=ram_"+(i+16)+" value="+ram[i+16]+"></td>\n";
+
+		table += "<td width='32' class=addr id=addr_"+(i+32)+">"+(i+32)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+32)+"');\" onBlur=\"ram_set("+(i+32)+", document.getElementById('ram_"+(i+32)+"').value);\" size='3' class=ram id=ram_"+(i+32)+" value="+ram[i+32]+"></td>\n";
+
+		table += "<td width='32' class=addr id=addr_"+(i+48)+">"+(i+48)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+48)+"');\" onBlur=\"ram_set("+(i+48)+", document.getElementById('ram_"+(i+48)+"').value);\" size='3' class=ram id=ram_"+(i+48)+" value="+ram[i+48]+"></td></tr>\n";
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
@@ -372,7 +388,6 @@ function ram_modify(address, change)
 		reset();
 		return;
 	}
-
 	if (change > 0 ) {
 		ram[address]++;
 	} else if(change < 0 ) {
@@ -381,23 +396,26 @@ function ram_modify(address, change)
 		ram[address] = 0;
 	}
 	ram_highlight(address);
-	document.getElementById("ram_"+address).innerHTML = ram[address];
+	document.getElementById("ram_"+address).value = ram[address];
 	ram_last_address = address;
 }
 
 /* modify one byte of memory - set to address */
 function ram_set(address, val)
 {
+	var prev_value = ram[address];
+	if(address == 'undefined') { alert("Address not defined for ram_set."); return; }
 	if(address < 0 || address > 63) {
 		alert("SEGFAULT: Cannot Modify Data Outside of Memory Range");
 		halt = true;
 		reset();
 		return;
 	}
-
 	ram[address] = val;
-	ram_highlight(address);
-	document.getElementById("ram_"+address).innerHTML = ram[address];
+	if(prev_value != val) {
+		ram_highlight(address);
+		document.getElementById("ram_"+address).innerHTML = ram[address];
+	}
 	ram_last_address = address;
 }
 
@@ -448,7 +466,9 @@ function dat_point_modify_by_address(val)
 		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
 	}
 	dat_pointer_changed = 1;
-	dat_point_highlight();
+	if(dat_pointer_last_address != val) {
+		dat_point_highlight();
+	}
 }
 
 /* turns on and off data pointer highlight if it has changed this step */

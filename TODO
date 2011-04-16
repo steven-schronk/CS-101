@@ -26,8 +26,6 @@ Need method to load/save code for later use.
 
 Need stop button that works with endless loops. (Could pause program to allow button click?)
 
-Add ability to modify memory location at any time.
-
-Data Pointer highlights when no change has been made.
-
 Step back button not fully implemented.
+
+As code runs you cannot always see current instruction in code window.
