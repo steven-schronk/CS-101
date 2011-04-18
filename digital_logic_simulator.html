@@ -211,6 +211,7 @@ function init_form()
 	if(grid_status) {draw_grid(); }
 	init_stage();
 	draw_stage();
+	// draw_logo();
 }
 
 function draw_clock(x,y,phase)
@@ -726,6 +727,162 @@ function cnvs_clicked(e)
 	};
 }
 
+function draw_logo()
+{
+	// title of program
+	ctx.font = "60pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText("Digital Logic Simulator", 600, 100);
+
+	// instructions to continue
+	ctx.font = "20pt Arial";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText("Click on Grid to Continue", 600, 400);
+
+	// The text (H)
+	ctx.fillStyle = "#000000";
+	ctx.beginPath();
+	ctx.moveTo(31.8, 0.0);
+	ctx.lineTo(38.5, 0.0);
+	ctx.lineTo(38.5, 6.7);
+	ctx.lineTo(44.7, 6.7);
+	ctx.lineTo(44.7, 0.0);
+	ctx.lineTo(51.5, 0.0);
+	ctx.lineTo(51.5, 20.2);
+	ctx.lineTo(44.7, 20.2);
+	ctx.lineTo(44.7, 13.5);
+	ctx.lineTo(38.5, 13.5);
+	ctx.lineTo(38.5, 20.2);
+	ctx.lineTo(31.8, 20.2);
+	ctx.lineTo(31.8, 0.0);
+	ctx.closePath();
+	ctx.fill();
+
+	// The text (T)
+	ctx.beginPath();
+	ctx.moveTo(60.3, 6.7);
+	ctx.lineTo(54.4, 6.7);
+	ctx.lineTo(54.4, 0.0);
+	ctx.lineTo(73.1, 0.0);
+	ctx.lineTo(73.1, 6.7);
+	ctx.lineTo(67.1, 6.7);
+	ctx.lineTo(67.1, 20.2);
+	ctx.lineTo(60.4, 20.2);
+	ctx.lineTo(60.4, 6.7);
+	ctx.closePath();
+	ctx.fill();
+
+	// The text (M)
+	ctx.beginPath();
+	ctx.moveTo(76.0, 0.0);
+	ctx.lineTo(83.1, 0.0);
+	ctx.lineTo(87.4, 7.1);
+	ctx.lineTo(91.7, 0.0);
+	ctx.lineTo(98.8, 0.0);
+	ctx.lineTo(98.8, 20.2);
+	ctx.lineTo(92.1, 20.2);
+	ctx.lineTo(92.1, 10.2);
+	ctx.lineTo(87.4, 17.4);
+	ctx.lineTo(82.6, 10.2);
+	ctx.lineTo(82.6, 20.2);
+	ctx.lineTo(76.0, 20.2);
+	ctx.lineTo(76.0, 0.0);
+	ctx.closePath();
+	ctx.fill();
+
+	// The text (L)
+	ctx.beginPath();
+	ctx.moveTo(102.2, 0.0);
+	ctx.lineTo(108.9, 0.0);
+	ctx.lineTo(108.9, 13.5);
+	ctx.lineTo(118.4, 13.5);
+	ctx.lineTo(118.4, 20.2);
+	ctx.lineTo(102.2, 20.2);
+	ctx.lineTo(102.2, 0.0);
+	ctx.closePath();
+	ctx.fill();
+
+	// Dark background
+	ctx.fillStyle = "#E44D26";
+	ctx.beginPath();
+	ctx.moveTo(31.5, 138.0);
+	ctx.lineTo(21.9, 29.5);
+	ctx.lineTo(128.1, 29.5);
+	ctx.lineTo(118.5, 138.0);
+	ctx.lineTo(74.9, 150.0);
+	ctx.closePath();
+	ctx.fill();
+
+	// Light background
+	ctx.fillStyle = "#F16529";
+	ctx.beginPath();
+	ctx.moveTo(75.0, 140.7);
+	ctx.lineTo(110.1, 131.0);
+	ctx.lineTo(118.5, 38.3);
+	ctx.lineTo(75.0, 38.3);
+	ctx.closePath();
+	ctx.fill();
+
+	// Dark foreground
+	ctx.fillStyle = "#EBEBEB";
+	ctx.beginPath();
+	ctx.moveTo(75.0, 78.6);
+	ctx.lineTo(57.4, 78.6);
+	ctx.lineTo(56.2, 65.0);
+	ctx.lineTo(75.0, 65.0);
+	ctx.lineTo(75.0, 51.7);
+	ctx.lineTo(75.0, 51.7);
+	ctx.lineTo(41.6, 51.7);
+	ctx.lineTo(42.0, 55.2);
+	ctx.lineTo(45.2, 91.9);
+	ctx.lineTo(75.0, 91.9);
+	ctx.closePath();
+	ctx.fill();
+	ctx.beginPath();
+	ctx.moveTo(75.0, 113.1);
+	ctx.lineTo(74.9, 113.1);
+	ctx.lineTo(60.1, 109.2);
+	ctx.lineTo(59.2, 98.6);
+	ctx.lineTo(52.0, 98.6);
+	ctx.lineTo(45.8, 98.6);
+	ctx.lineTo(47.7, 119.4);
+	ctx.lineTo(74.9, 127.0);
+	ctx.lineTo(75.0, 127.0);
+	ctx.closePath();
+	ctx.fill();
+
+	// Light foreground
+	ctx.fillStyle = "#FFFFFF";
+	ctx.beginPath();
+	ctx.moveTo(75.0, 78.6);
+	ctx.lineTo(75.0, 91.9);
+	ctx.lineTo(91.4, 91.9);
+	ctx.lineTo(89.8, 109.2);
+	ctx.lineTo(75.0, 113.1);
+	ctx.lineTo(75.0, 127.0);
+	ctx.lineTo(102.2, 119.4);
+	ctx.lineTo(102.5, 117.2);
+	ctx.lineTo(105.6, 82.1);
+	ctx.lineTo(105.9, 78.6);
+	ctx.lineTo(102.3, 78.6);
+	ctx.closePath();
+	ctx.fill();
+	ctx.beginPath();
+	ctx.moveTo(75.0, 51.7);
+	ctx.lineTo(75.0, 59.9);
+	ctx.lineTo(75.0, 64.9);
+	ctx.lineTo(75.0, 65.0);
+	ctx.lineTo(107.1, 65.0);
+	ctx.lineTo(107.1, 65.0);
+	ctx.lineTo(107.1, 65.0);
+	ctx.lineTo(107.4, 62.0);
+	ctx.lineTo(108.0, 55.2);
+	ctx.lineTo(108.3, 51.7);
+	ctx.closePath();
+	ctx.fill();
+}
 </script>
 
 <style type="text/css">
