@@ -95,7 +95,6 @@ function fnd_nxt_inst()
 		halt = true;
 		reset();
 	}
-	
 	/* highlight code currently executing on screen */
 	code_highlight(disp_code, ins_pointer-1, ins_pointer);
 }
@@ -358,17 +357,17 @@ function ram_init()
 		} else {
 			table += "\t<tr class=odd>";
 		}
-		table += "<td width='32' class=addr id=addr_"+i+">"+i+"</td>";
-		table += "<td><input onClick=\"select_all('ram_"+i+"');\" onBlur=\"ram_set("+i+", document.getElementById('ram_"+i+"').value);\" size='3' class=ram id=ram_"+i+" value="+ram[i]+"></td>";
+		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+i+"');\" onBlur=\"ram_set("+i+", document.getElementById('ram_"+i+"').value);\" size='2' class=ram id=ram_"+i+" value="+ram[i]+"></td>";
 
-		table += "<td width='32' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td>";
-		table += "<td><input onClick=\"select_all('ram_"+(i+16)+"');\" onBlur=\"ram_set("+(i+16)+", document.getElementById('ram_"+(i+16)+"').value);\" size='3' class=ram id=ram_"+(i+16)+" value="+ram[i+16]+"></td>\n";
+		table += "<td width='35' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+16)+"');\" onBlur=\"ram_set("+(i+16)+", document.getElementById('ram_"+(i+16)+"').value);\" size='2' class=ram id=ram_"+(i+16)+" value="+ram[i+16]+"></td>\n";
 
-		table += "<td width='32' class=addr id=addr_"+(i+32)+">"+(i+32)+"</td>";
-		table += "<td><input onClick=\"select_all('ram_"+(i+32)+"');\" onBlur=\"ram_set("+(i+32)+", document.getElementById('ram_"+(i+32)+"').value);\" size='3' class=ram id=ram_"+(i+32)+" value="+ram[i+32]+"></td>\n";
+		table += "<td width='35' class=addr id=addr_"+(i+32)+">"+(i+32)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+32)+"');\" onBlur=\"ram_set("+(i+32)+", document.getElementById('ram_"+(i+32)+"').value);\" size='2' class=ram id=ram_"+(i+32)+" value="+ram[i+32]+"></td>\n";
 
-		table += "<td width='32' class=addr id=addr_"+(i+48)+">"+(i+48)+"</td>";
-		table += "<td><input onClick=\"select_all('ram_"+(i+48)+"');\" onBlur=\"ram_set("+(i+48)+", document.getElementById('ram_"+(i+48)+"').value);\" size='3' class=ram id=ram_"+(i+48)+" value="+ram[i+48]+"></td></tr>\n";
+		table += "<td width='35' class=addr id=addr_"+(i+48)+">"+(i+48)+"</td>";
+		table += "<td><input onClick=\"select_all('ram_"+(i+48)+"');\" onBlur=\"ram_set("+(i+48)+", document.getElementById('ram_"+(i+48)+"').value);\" size='2' class=ram id=ram_"+(i+48)+" value="+ram[i+48]+"></td></tr>\n";
 	}
 	table +=  "</table>\n";
 	disp_ram.innerHTML = table;
@@ -562,7 +561,7 @@ body {
 
 #code_buttons {
 	position: absolute;
-	top: 570px;
+	top: 600px;
 	left: 10px;
 }
 
@@ -574,32 +573,32 @@ body {
 
 #da_banner {
 	position: absolute;
-	top: 360px;
-	left: 625px;
+	top: 380px;
+	left: 715px;
 }
 
 #ref_banner {
 	position: absolute;
-	top: 410px;
-	left: 625px;
+	top: 430px;
+	left: 715px;
 }
 
 #ip_banner {
 	position: absolute;
-	top: 315px;
-	left: 625px;
+	top: 330px;
+	left: 715px;
 }
 
 #output_banner {
 	position: absolute;
 	top: 120px;
-	left: 625px;
+	left: 715px;
 }
 
 #memory_banner {
 	position: absolute;
 	top: 120px;
-	left: 315px;
+	left: 350px;
 }
 
 #input {
@@ -611,7 +610,7 @@ body {
 #ram_disp {
 	position: absolute;
 	top: 140px;
-	left: 315px;
+	left: 350px;
 }
 
 #memory_table {
@@ -621,11 +620,13 @@ body {
 
 .even td {
 	padding: 4px;
+	height:33px;
 	border-bottom:1px solid #000;
 }
 
 .odd td {
 	padding: 4px;
+	height:33px;
 	background-color: #def;
 	border-bottom: 1px solid #000;
 }
@@ -634,14 +635,10 @@ body {
 	color: #00f;
 }
 
-.ram {
-	border-right:1px solid #000;
-}
-
 #output {
 	position: absolute;
 	top: 140px;
-	left: 625px;
+	left: 715px;
 }
 
 #docs {
@@ -709,14 +706,14 @@ body {
 
 #instruction {
 	position: absolute;
-	top: 335px;
-	left: 625px;
+	top: 355px;
+	left: 715px;
 }
 
 #data {
 	position: absolute;
-	top: 385px;
-	left: 625px;
+	top: 405px;
+	left: 715px;
 }
 
 #ascii {
@@ -728,9 +725,9 @@ body {
 	border-collapse: collapse;
 	border: 1px solid #ddd;
 	position: absolute;
-	top: 430px;
-	left: 625px;
-	width: 280px;
+	top: 450px;
+	left: 715px;
+	width: 320px;
 }
 
 #ascii {
@@ -810,6 +807,8 @@ body {
 	<tr class="ref_odd" ><td class="ref_ins"><</td><td>decrement data pointer</td></tr>
 	<tr class="ref_even"><td class="ref_ins">.</td><td>print byte at data pointer</td></tr>
 	<tr class="ref_odd" ><td class="ref_ins">,</td><td>accept one byte of input</td></tr>
+	<tr class="ref_even"><td class="ref_ins">[</td><td>jump forward if data pointer nonzero</td></tr>
+	<tr class="ref_odd"><td class="ref_ins">]</td><td>jump back if data pointer nonzero</td></tr>
 	<tr class="ref_even"><td class="ref_ins">*</td><td>set breakpoint</td></tr>
 </table>
 
