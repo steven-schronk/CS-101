@@ -25,7 +25,7 @@ var disp_code;
 var disp_ram;
 var disp_ins_pointer;
 var disp_dat_pointer;
-var disp_pointer = "<div id=disp_pointer>&#8658;</div>"; /* data pointer displayed in memory block */
+var disp_pointer = "&#8658;"; /* data pointer displayed in memory block */
 
 /* select all contents of this input for the convenience of the user */
 function select_all(e)
@@ -202,7 +202,7 @@ function reset()
 	ram_highlight_clear();
 	dat_point_highlight();
 	document.getElementById("output_disp").innerHTML = '';
-	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
+	document.getElementById("addr_0").innerHTML = disp_pointer;
 	disp_ins_pointer.style.backgroundColor = "#fff";
 	dat_point_highlight_clear();
 	code_highlight(disp_code, 0, 1);
@@ -295,7 +295,7 @@ function init_form()
 	disp_ram = document.getElementById("ram_disp");
 	ram_init();
 	ram_reset();	
-	document.getElementById("addr_0").innerHTML = "0" + disp_pointer;
+	document.getElementById("addr_0").innerHTML = disp_pointer;
 	disp_docs = document.getElementById("docs");
 	
 	/* put hello world into input window */
@@ -357,16 +357,20 @@ function ram_init()
 		} else {
 			table += "\t<tr class=odd>";
 		}
-		table += "<td width='35' class=addr id=addr_"+i+">"+i+"</td>";
+		table += "<td>"+i+"</td>";
+		table += "<td class=addr id=addr_"+i+">"+disp_pointer+"</td>";
 		table += "<td><input onClick=\"select_all('ram_"+i+"');\" onBlur=\"ram_set("+i+", document.getElementById('ram_"+i+"').value);\" size='2' class=ram id=ram_"+i+" value="+ram[i]+"></td>";
 
-		table += "<td width='35' class=addr id=addr_"+(i+16)+">"+(i+16)+"</td>";
+		table += "<td>"+(i+16)+"</td>";
+		table += "<td class=addr id=addr_"+(i+16)+">"+disp_pointer+"</td>";
 		table += "<td><input onClick=\"select_all('ram_"+(i+16)+"');\" onBlur=\"ram_set("+(i+16)+", document.getElementById('ram_"+(i+16)+"').value);\" size='2' class=ram id=ram_"+(i+16)+" value="+ram[i+16]+"></td>\n";
 
-		table += "<td width='35' class=addr id=addr_"+(i+32)+">"+(i+32)+"</td>";
+		table += "<td>"+(i+32)+"</td>";
+		table += "<td width='35' class=addr id=addr_"+(i+32)+">"+disp_pointer+"</td>";
 		table += "<td><input onClick=\"select_all('ram_"+(i+32)+"');\" onBlur=\"ram_set("+(i+32)+", document.getElementById('ram_"+(i+32)+"').value);\" size='2' class=ram id=ram_"+(i+32)+" value="+ram[i+32]+"></td>\n";
 
-		table += "<td width='35' class=addr id=addr_"+(i+48)+">"+(i+48)+"</td>";
+		table += "<td>"+(i+48)+"</td>";
+		table += "<td width='35' class=addr id=addr_"+(i+48)+">"+disp_pointer+"</td>";
 		table += "<td><input onClick=\"select_all('ram_"+(i+48)+"');\" onBlur=\"ram_set("+(i+48)+", document.getElementById('ram_"+(i+48)+"').value);\" size='2' class=ram id=ram_"+(i+48)+" value="+ram[i+48]+"></td></tr>\n";
 	}
 	table +=  "</table>\n";
@@ -439,12 +443,12 @@ function dat_point_modify(change)
 
 	/* place '>' char next to memory address in table */
 	if(dat_pointer >= 0 && dat_pointer < 64) {
-		document.getElementById("addr_"+dat_pointer).innerHTML = dat_pointer + disp_pointer;
+		document.getElementById("addr_"+dat_pointer).style.color = "#f00";
 	}
 
 	/* remove '>' char next to memory address in table */
 	if(dat_pointer_last_address >= 0 && dat_pointer_last_address < 64) {
-		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
+		document.getElementById("addr_"+dat_pointer_last_address).style.color  = "#fff";
 	}
 
 	disp_dat_pointer.value = dat_pointer;
@@ -457,12 +461,12 @@ function dat_point_modify_by_address(val)
 	dat_pointer = disp_dat_pointer.value;
 	/* place '>' char next to memory address in table */
 	if(dat_pointer >= 0 && dat_pointer < 64) {
-		document.getElementById("addr_"+dat_pointer).innerHTML = dat_pointer + disp_pointer;
+		document.getElementById("addr_"+dat_pointer).style.color  = "#f00";
 	}
 
 	/* remove '>' char next to memory address in table */
 	if(dat_pointer_last_address >= 0 && dat_pointer_last_address < 64) {
-		document.getElementById("addr_"+dat_pointer_last_address).innerHTML = dat_pointer_last_address;
+		document.getElementById("addr_"+dat_pointer_last_address).style.color  = "#fff";
 	}
 	dat_pointer_changed = 1;
 	if(dat_pointer_last_address != val) {
@@ -550,72 +554,67 @@ function docs_try(ex)
 
 <style type="text/css">
 
+#topsection {
+	height: 70px; /* height of top section */
+}
+
+#topsection h1 {
+	margin: 0;
+	padding-top: 15px;
+}
+
+#contentwrapper {
+	float: left;
+	width: 100%;
+	margin-left: -30%; /* Set left margin to -(RightColumnWidth) */
+}
+
+#contentcolumn {
+	margin: 0 450px 0 30% /* Set margin to 0 (LeftColumnWidth) 0 (RightColumnWidth) */
+}
+
+#leftcolumn {
+	float: left;
+	width: 450px; /* Width of left column in pixels */
+	margin-left: -450px; /* Set left margin to -(LeftColumnWidth) */
+}
+
+#rightcolumn {
+	float: left;
+	width: 30%; /*Width of right column in percentage*/
+}
+
+#footer {
+	clear: left;
+	width: 100%;
+	text-align: center;
+	padding: 4px 0;
+}
+
+#footer a {
+	color: #FFFF80;
+}
+
 body {
+	margin: 0;
+	padding: 0;
+	line-height: 1.5em;
 	font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
 
+.addr {
+	color: #fff;
+}
+
 #disp_pointer {
-	float:right;
+	float: right;
 	color: #f00;
-}
-
-#code_buttons {
-	position: absolute;
-	top: 600px;
-	left: 10px;
-}
-
-#input_banner {
-	position: absolute;
-	top: 120px;
-	left: 10px;
-}
-
-#da_banner {
-	position: absolute;
-	top: 380px;
-	left: 715px;
-}
-
-#ref_banner {
-	position: absolute;
-	top: 430px;
-	left: 715px;
-}
-
-#ip_banner {
-	position: absolute;
-	top: 330px;
-	left: 715px;
-}
-
-#output_banner {
-	position: absolute;
-	top: 120px;
-	left: 715px;
-}
-
-#memory_banner {
-	position: absolute;
-	top: 120px;
-	left: 350px;
-}
-
-#input {
-	position: absolute;
-	top: 140px;
-	left: 10px;
-}	
-
-#ram_disp {
-	position: absolute;
-	top: 140px;
-	left: 350px;
 }
 
 #memory_table {
 	border:1px solid #000;
 	border-collapse: collapse;
+	width: 200px;
 }
 
 .even td {
@@ -629,16 +628,6 @@ body {
 	height:33px;
 	background-color: #def;
 	border-bottom: 1px solid #000;
-}
-
-.addr {
-	color: #00f;
-}
-
-#output {
-	position: absolute;
-	top: 140px;
-	left: 715px;
 }
 
 #docs {
@@ -704,18 +693,6 @@ body {
 	visibility: hidden;
 }
 
-#instruction {
-	position: absolute;
-	top: 355px;
-	left: 715px;
-}
-
-#data {
-	position: absolute;
-	top: 405px;
-	left: 715px;
-}
-
 #ascii {
 	border-collapse: collapse;
 	border: 1px solid #ddd;
@@ -724,10 +701,6 @@ body {
 #reference {
 	border-collapse: collapse;
 	border: 1px solid #ddd;
-	position: absolute;
-	top: 450px;
-	left: 715px;
-	width: 320px;
 }
 
 #ascii {
@@ -760,10 +733,13 @@ body {
 }
 
 </style>
+
 <body onLoad="init_form();">
 
-<center><h2>Turing Tarpit Simulator</h2></center>
+<div id="maincontainer">
 
+<div id="topsection">
+<br>
 <center>
 <button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png" title="Restart" alt="Restart"></button>
 &nbsp;&nbsp;
@@ -780,6 +756,14 @@ body {
 <button onClick='display_docs();'><img src="http://opentextbook.info/icons/32x32/book_open.png" title="Open Documentation" alt="Open Documentation"></button>
 </center>
 
+</div>
+
+<div id="contentwrapper">
+<div id="contentcolumn">
+	<div id="input_banner">INPUT</div>
+<div id="input"><textarea id="code" rows="27" style="width: 95%"></textarea></div>
+<br>
+<center>
 <div id="code_buttons">
 <button id="dbg_status" onClick='debug_toggle_breakpoints();'  title="Enable/Disable Breakpoints" alt="Enable/Disable Breakpoints">
 	<img src="http://opentextbook.info/icons/32x32/bug_add.png">
@@ -788,10 +772,26 @@ body {
 <button id="dbg_status" onClick='debug_remove_breakpoints();'  title="Remove Breakpoints" alt="Remove Breakpoints">
 	<img src="http://opentextbook.info/icons/32x32/bin.png">
 </button>
+</center>
+
 </div>
 
-<div id="input_banner">INPUT</div>
-<div id="input"><textarea id="code" rows="27" cols="38"></textarea></div>
+</div>
+
+</div>
+</div>
+
+<div id="leftcolumn">
+<div id="memory_banner">MEMORY</div>
+<div id="ram_disp"></div>
+
+</div>
+
+<div id="rightcolumn">
+<div id="output_banner">OUTPUT</div>
+<div id="output">
+<textarea name=code id=output_disp rows="10" style="width: 95%" disabled ></textarea>
+</div>
 
 <div id="ip_banner">INSTRUCTION POINTER</div>
 <div id="instruction"><input onClick="select_all('ins_pointer_disp');" onBlur="ins_point_modify_by_address(disp_ins_pointer.value);" id="ins_pointer_disp" type="text" diabled value=0></div>
@@ -811,13 +811,12 @@ body {
 	<tr class="ref_odd"><td class="ref_ins">]</td><td>jump back if data pointer nonzero</td></tr>
 	<tr class="ref_even"><td class="ref_ins">*</td><td>set breakpoint</td></tr>
 </table>
-
-<div id="memory_banner">MEMORY</div>
-<div id="ram_disp"></div>
-<div id="output_banner">OUTPUT</div>
-<div id="output">
-<textarea name=code id=output_disp rows="10" cols="38" disabled ></textarea>
 </div>
+<!--
+<div id="footer">Footer</div>
+-->
+</div>
+
 <div id="docs">
 	<div id="docs_top_banner">
 		Turing Tarpit Simulator Documentation&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

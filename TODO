@@ -20,8 +20,6 @@ beginning with clearing current stage.
 
 --------------------------TURING TARPIT SIMULATOR------------------------------
 
-Stylesheet does not work properly on Windows Firefox and Internet Explorer
-
 Need method to load/save code for later use.
 
 Need stop button that works with endless loops. (Could pause program to allow button click?)
