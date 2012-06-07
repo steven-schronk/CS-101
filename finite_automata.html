@@ -8,11 +8,11 @@ var PI = 3.141592654;
 var TWO_PI = PI * 2;
 
 var stage = new Array();	/* status of stage - all details stored here		*/
-var input_store = new Array();	/* status of input */
-var output_store = new Array();	/* status of output */
+var store = new Array();	/* status of input */
 
 var stage_rows = 8;		/* number of rows on stage				*/
 var stage_cols = 9;		/* number of columns on stage				*/
+var store_bit_count = 10;	/* number of bits stored in machine			*/
 
 var input_count = 10;		/* number of input bits */
 
@@ -24,6 +24,28 @@ var canvas_input;		/* object id of input tag 				*/
 var ctx;			/* context of canvas					*/
 var input;			/* context of input canvas 				*/
 
+
+/* bits are stored in a circular array - mark is first bit in list */
+/* add new bit to front of store */
+function store_push(c){
+
+}
+
+/* remove front bit from store */
+function store_pop(c){
+
+}
+
+/* add new bit to end of store */
+function store_enq(c){
+
+}
+
+/* remove end bit from store */
+function store_deq(c){
+
+}
+
 /* each square on grid has an associated block of data tied to it */
 function grid(type, bit, dir){
 	this.type = type;
@@ -31,6 +53,12 @@ function grid(type, bit, dir){
 	this.dir  = dir;	/* direction this item is turned */
 }
 
+/*
+function bit(color, mark){
+	this.color = color;
+	this.mark  = mark;
+}
+*/
 /* create all output data structures and draw inital values on screen */
 function init_stage(){
 	var x; var y;
@@ -62,10 +90,13 @@ function init_stage(){
 
 /* set initial values for input */
 function init_input(){
-	input_store[0] = "red";
-	input_store[1] = "blue";
-	input_store[2] = "yellow";
-	input_store[3] = "green";
+	store.push("red");
+	store.push("blue");
+	store.push("yellow");
+	store.push("green");	/* add to end 		*/
+	//store.unshift("red"); /* add to front 	*/
+	//store.pop();	 	/* remove from end	*/
+	//store.shift(); 	/* remove from front 	*/
 }
 
 /* draw faint gridlines on stage - used as a guide for the user */
@@ -143,20 +174,20 @@ function draw_tape(){
 	var i = 0; var x = 50;
 	input.fillStyle = "#f00";
 	while(i < input_count){
-		if(input_store[i]) {
+		if(store[i]) {
 			input.beginPath();
-			switch(input_store[i]) {
+			switch(store[i]) {
 				case "red":
 					input.fillStyle = "#f00";
 					break;
 				case "blue":
-					input.fillStyle = "#0f0";
+					input.fillStyle = "#00f";
 					break;
 				case "yellow":
 					input.fillStyle = "#ff0";
 					break;
 				case "green":
-					input.fillStyle = "#00f";
+					input.fillStyle = "#0f0";
 					break;
 				default: input.fillStyle = "#000";
 			}
