@@ -30,15 +30,16 @@ var ctx;			/* context of canvas					*/
 var input;			/* context of input canvas 				*/
 
 /* each square on grid has an associated block of data tied to it */
-function grid(type, bit, dir){
-	this.type = type;
-	this.bit  = bit;	/* data in this block - if any */
-	this.dir  = dir;	/* direction this item is turned */
+function grid(type, bit, dir, col){
+	this.type = type;	/* type of machine part 			*/
+	this.bit  = bit;	/* data in this block - if any 		*/
+	this.dir  = dir;	/* direction this item is turned 	*/
+	this.col  = col;	/* color of machine part (if any)	*/ 
 }
 
 /* this is used to display all bits on all active items */
 function test_types(){
-	var i = 0, j = 0, k = 1, l = 2;
+	var i = 0, j = 0, k = 1, l = 2, col = 1;
 	for(i = 0; i < stage_rows; i++) {
 		for(j = 0; j < stage_rows; j++){
 			if(k == 6) { k = 1; }
@@ -47,7 +48,17 @@ function test_types(){
 				case 2: stage[i][j].type = "bus"; break;
 				case 3: stage[i][j].type = "input"; break;
 				case 4: stage[i][j].type = "output"; break;
-				case 5: stage[i][j].type = "bitadd"; break;
+				case 5:
+					stage[i][j].type = "bitadd";
+					if(col == 5) { col = 1; }
+					switch(col){
+						case 1: stage[i][j].col = RED;    break;
+						case 2: stage[i][j].col = GREEN;  break;
+						case 3: stage[i][j].col = YELLOW; break;
+						case 4: stage[i][j].col = BLUE;   break;
+					};
+					col++;
+					break;
 			};
 			k++;
 			if(l == 5) { l = 1; }
@@ -70,7 +81,7 @@ function init_stage(){
 	for(x = 0; x < stage_cols; x++) {
 		stage[x] = new Array();
 		for(y = 0; y < stage_rows; y++) {
-			stage[x][y] = new grid('', '', '');
+			stage[x][y] = new grid('', '', '', '');
 		}
 	}
 	stage[5][0].type = "input";
@@ -204,7 +215,7 @@ function draw_tile(x,y){
 	ctx.translate(grid_size * x, grid_size * y);
 	switch (stage[x][y].type){
 		case "bitadd":
-			draw_bitadd(RED);
+			draw_bitadd(stage[x][y].col);
 			break;
 		case "branch":
 			draw_branch();
@@ -242,11 +253,11 @@ function draw_bit(color){
 
 /* draw gray square with black outline */
 function draw_input(){
-	ctx.lineWidth = 2;
+	ctx.lineWidth = 1;
 	ctx.strokeStyle = "#000";
-	ctx.strokeRect(2,2,grid_size-4,grid_size-4);
+	ctx.strokeRect(0,0,grid_size,grid_size);
 	ctx.fillStyle = "#aaa";
-	ctx.fillRect( 3 ,3 ,grid_size-6,grid_size-6);
+	ctx.fillRect(0,0,grid_size,grid_size);
 }
 
 /* a bus moves bits from one location to another */
@@ -295,9 +306,8 @@ function draw_bus(dir){
 
 /* tiles branch movement of each bit */
 function draw_branch(){
-	ctx.lineWidth = 2;
-
 	/* left */
+	ctx.lineWidth = 1;
 	ctx.fillStyle = "#f00";
 	ctx.beginPath(); 
 	ctx.moveTo(0,0);
@@ -335,19 +345,39 @@ function draw_branch(){
 	ctx.fill();	
 }
 
-function draw_bitadd(color, direction){
-	ctx.lineWidth = 10;
-	ctx.strokeStyle = color;
+function draw_bitadd(color){
+	var i = 0;
+	while(i < 2){
+		if(i==1){
+			ctx.strokeStyle = color;
+			ctx.lineWidth = 10;
+		} else {
+			ctx.strokeStyle = "#000";
+			ctx.lineWidth = 15;		
+		}
+		ctx.beginPath();
+		ctx.moveTo(grid_size/2,0);
+		ctx.lineTo(grid_size/2,grid_size);
+		ctx.closePath();
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.moveTo(0, grid_size/2);
+		ctx.lineTo(grid_size,grid_size/2);
+		ctx.closePath();
+		ctx.stroke();
+		i++;
+	}
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 1;
 	ctx.beginPath();
-	ctx.moveTo(grid_size/2,0);
-	ctx.lineTo(grid_size/2,grid_size);
+	ctx.moveTo(0, 0);
+	ctx.lineTo(0,grid_size);
+	ctx.lineTo(grid_size,grid_size);
+	ctx.lineTo(grid_size,0);
+	ctx.lineTo(0,0);
 	ctx.closePath();
 	ctx.stroke();
-
-	ctx.moveTo(0, grid_size/2);
-	ctx.lineTo(grid_size,grid_size/2);
-	ctx.closePath();
-	ctx.stroke();	
 }
 
 /* clear this square by setting area to white */
