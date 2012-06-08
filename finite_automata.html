@@ -63,10 +63,10 @@ function test_types(){
 			k++;
 			if(l == 5) { l = 1; }
 			switch(l){
-				case 1: stage[i][j].bit = RED; break;
-				case 2: stage[i][j].bit = GREEN; break;
+				case 1: stage[i][j].bit = RED;    break;
+				case 2: stage[i][j].bit = GREEN;  break;
 				case 3: stage[i][j].bit = YELLOW; break;
-				case 4: stage[i][j].bit = BLUE; break;
+				case 4: stage[i][j].bit = BLUE;   break;
 			};
 			l++;
 		}
@@ -102,8 +102,23 @@ function init_stage(){
 	stage[0][4].type = "bus";
 	stage[0][4].dir = 4;
 
-	test_types();
+	//test_types();
+}
 
+/* moves automata to next position */
+function next_move(){
+
+	// determine what type of machine part we are on 
+
+	// if we are on a bus move to next grid
+
+	// if we are on an input, make next bit dissappear from tape
+	// place bit on input
+
+	// if we are on a branch, determine which direction to move
+	// and move there
+
+	// if we are on an output, remove bit and move to an input
 }
 
 /* set initial values for input */
