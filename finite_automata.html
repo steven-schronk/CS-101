@@ -7,10 +7,10 @@
 var PI = 3.141592654;
 var TWO_PI = PI * 2;
 
-var RED    = "#f00";
 var BLUE   = "#00f";
-var YELLOW = "#ff0";
 var GREEN  = "#0f0";
+var RED    = "#f00";
+var YELLOW = "#ff0";
 
 var stage = new Array();	/* status of stage - all details stored here		*/
 var store = new Array();	/* status of input 					*/
@@ -52,10 +52,10 @@ function test_types(){
 			k++;
 			if(l == 5) { l = 1; }
 			switch(l){
-				case 1: stage[i][j].bit = "red"; break;
-				case 2: stage[i][j].bit = "green"; break;
-				case 3: stage[i][j].bit = "yellow"; break;
-				case 4: stage[i][j].bit = "blue"; break;
+				case 1: stage[i][j].bit = RED; break;
+				case 2: stage[i][j].bit = GREEN; break;
+				case 3: stage[i][j].bit = YELLOW; break;
+				case 4: stage[i][j].bit = BLUE; break;
 			};
 			l++;
 		}
@@ -97,10 +97,10 @@ function init_stage(){
 
 /* set initial values for input */
 function init_input(){
-	store.push("red");
-	store.push("blue");
-	store.push("yellow");
-	store.push("green");	/* add to end 		*/
+	store.push(RED);
+	store.push(BLUE);
+	store.push(YELLOW);
+	store.push(GREEN);	/* add to end 		*/
 	//store.unshift("red"); /* add to front 	*/
 	//store.pop();	 	/* remove from end	*/
 	//store.shift(); 	/* remove from front 	*/
@@ -183,21 +183,7 @@ function draw_tape(){
 	while(i < input_count){
 		if(store[i]) {
 			input.beginPath();
-			switch(store[i]) {
-				case "red":
-					input.fillStyle = "#f00";
-					break;
-				case "blue":
-					input.fillStyle = "#00f";
-					break;
-				case "yellow":
-					input.fillStyle = "#ff0";
-					break;
-				case "green":
-					input.fillStyle = "#0f0";
-					break;
-				default: input.fillStyle = "#000";
-			}
+			input.fillStyle = store[i];
 			input.arc(x,25,20,0,TWO_PI,0);
 			input.fill();
 
@@ -243,21 +229,7 @@ function draw_tile(x,y){
 function draw_bit(color){
 	ctx.fillStyle = "#f00";
 	ctx.beginPath();
-	switch(color) {
-		case "red":
-			ctx.fillStyle = "#f00";
-			break;
-		case "blue":
-			ctx.fillStyle = "#00f";
-			break;
-		case "yellow":
-			ctx.fillStyle = "#ff0";
-			break;
-		case "green":
-			ctx.fillStyle = "#0f0";
-			break;
-		default: ctx.fillStyle = "#000";
-	}
+	ctx.fillStyle = color;
 	ctx.arc(25,25,10,0,TWO_PI,0);
 	ctx.fill();
 
