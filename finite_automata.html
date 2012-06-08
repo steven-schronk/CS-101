@@ -8,13 +8,13 @@ var PI = 3.141592654;
 var TWO_PI = PI * 2;
 
 var stage = new Array();	/* status of stage - all details stored here		*/
-var store = new Array();	/* status of input */
+var store = new Array();	/* status of input 					*/
 
 var stage_rows = 8;		/* number of rows on stage				*/
 var stage_cols = 9;		/* number of columns on stage				*/
 var store_bit_count = 10;	/* number of bits stored in machine			*/
 
-var input_count = 10;		/* number of input bits */
+var input_count = 10;		/* number of input bits 				*/
 
 var grid_status = 1; 		/* turn grid lines on and off 				*/
 var grid_size = 50;		/* size in pixels of grid lines - both X and Y		*/
@@ -24,28 +24,6 @@ var canvas_input;		/* object id of input tag 				*/
 var ctx;			/* context of canvas					*/
 var input;			/* context of input canvas 				*/
 
-
-/* bits are stored in a circular array - mark is first bit in list */
-/* add new bit to front of store */
-function store_push(c){
-
-}
-
-/* remove front bit from store */
-function store_pop(c){
-
-}
-
-/* add new bit to end of store */
-function store_enq(c){
-
-}
-
-/* remove end bit from store */
-function store_deq(c){
-
-}
-
 /* each square on grid has an associated block of data tied to it */
 function grid(type, bit, dir){
 	this.type = type;
@@ -53,12 +31,32 @@ function grid(type, bit, dir){
 	this.dir  = dir;	/* direction this item is turned */
 }
 
-/*
-function bit(color, mark){
-	this.color = color;
-	this.mark  = mark;
+/* this is used to display all bits on all active items */
+function test_types(){
+	var i = 0, j = 0, k = 1, l = 2;
+	for(i = 0; i < stage_rows; i++) {
+		for(j = 0; j < stage_rows; j++){
+			if(k == 5) { k = 1; }
+			switch(k){
+				case 1: stage[i][j].type = "branch"; break;
+				case 2: stage[i][j].type = "bus"; break;
+				case 3: stage[i][j].type = "input"; break;
+				case 4: stage[i][j].type = "output"; break;
+			};
+			k++;
+			if(l == 5) { l = 1; }
+			switch(l){
+			
+				case 1: stage[i][j].bit = "red"; break;
+				case 2: stage[i][j].bit = "green"; break;
+				case 3: stage[i][j].bit = "yellow"; break;
+				case 4: stage[i][j].bit = "blue"; break;
+			};
+			l++;
+		}
+	}
 }
-*/
+
 /* create all output data structures and draw inital values on screen */
 function init_stage(){
 	var x; var y;
@@ -71,6 +69,7 @@ function init_stage(){
 		}
 	}
 	stage[5][0].type = "input";
+	stage[5][0].bit = "red";
 	stage[5][1].type = "branch";
 	stage[5][2].type = "bus";
 	stage[5][6].type = "branch";
@@ -86,6 +85,9 @@ function init_stage(){
 	stage[0][3].dir = 3;
 	stage[0][4].type = "bus";
 	stage[0][4].dir = 4;
+
+	test_types();
+
 }
 
 /* set initial values for input */
@@ -224,7 +226,38 @@ function draw_tile(x,y){
 			break;
 		default: clear_square();
 	};
+
+	if(stage[x][y].bit){ draw_bit(stage[x][y].bit); }
 	ctx.restore();
+}
+
+/* draws small bit of correct color on grid */
+function draw_bit(color){
+	ctx.fillStyle = "#f00";
+	ctx.beginPath();
+	switch(color) {
+		case "red":
+			ctx.fillStyle = "#f00";
+			break;
+		case "blue":
+			ctx.fillStyle = "#00f";
+			break;
+		case "yellow":
+			ctx.fillStyle = "#ff0";
+			break;
+		case "green":
+			ctx.fillStyle = "#0f0";
+			break;
+		default: ctx.fillStyle = "#000";
+	}
+	ctx.arc(25,25,10,0,TWO_PI,0);
+	ctx.fill();
+
+	ctx.strokeStyle = "#000";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.arc(25,25,10,0,TWO_PI,0);
+	ctx.stroke();
 }
 
 /* draw gray square with black outline */
@@ -243,8 +276,8 @@ function draw_bus(dir){
 	ctx.fillStyle = "#aaa";
 	ctx.strokeStyle = "#000";
 
-	switch (dir) {
-		case 2: 
+	switch(dir){
+		case 2:
 			ctx.translate(grid_size,0);
 			ctx.rotate(PI/2);
 			break;
@@ -258,9 +291,8 @@ function draw_bus(dir){
 			break;
 	};
 
-	while(i < 2) {
-		ctx.save();
-
+	while(i < 2){
+		if(i == 1) { ctx.save(); ctx.translate(0, grid_size/2); }
 		ctx.beginPath();
 		ctx.moveTo(0,0);
 		ctx.lineTo(grid_size/2,grid_size/2);
@@ -276,9 +308,7 @@ function draw_bus(dir){
 		ctx.lineTo(grid_size/2,grid_size/4);
 		ctx.closePath();
 		ctx.stroke();
-
-		ctx.restore();
-		ctx.translate(0, grid_size/2);
+		if(i == 1) { ctx.restore(); }
 		i++;
 	}
 }
@@ -343,7 +373,7 @@ function cnvs_clicked(e){}
 <body onLoad="init_form();">
 
 <div id="topsection">
-<br>
+<!--
 <center>
 <button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png" title="Restart" alt="Restart"></button>
 &nbsp;&nbsp;
