@@ -7,6 +7,11 @@
 var PI = 3.141592654;
 var TWO_PI = PI * 2;
 
+var RED    = "#f00";
+var BLUE   = "#00f";
+var YELLOW = "#ff0";
+var GREEN  = "#0f0";
+
 var stage = new Array();	/* status of stage - all details stored here		*/
 var store = new Array();	/* status of input 					*/
 
@@ -36,17 +41,17 @@ function test_types(){
 	var i = 0, j = 0, k = 1, l = 2;
 	for(i = 0; i < stage_rows; i++) {
 		for(j = 0; j < stage_rows; j++){
-			if(k == 5) { k = 1; }
+			if(k == 6) { k = 1; }
 			switch(k){
 				case 1: stage[i][j].type = "branch"; break;
 				case 2: stage[i][j].type = "bus"; break;
 				case 3: stage[i][j].type = "input"; break;
 				case 4: stage[i][j].type = "output"; break;
+				case 5: stage[i][j].type = "bitadd"; break;
 			};
 			k++;
 			if(l == 5) { l = 1; }
 			switch(l){
-			
 				case 1: stage[i][j].bit = "red"; break;
 				case 2: stage[i][j].bit = "green"; break;
 				case 3: stage[i][j].bit = "yellow"; break;
@@ -212,6 +217,9 @@ function draw_tile(x,y){
 	ctx.save();
 	ctx.translate(grid_size * x, grid_size * y);
 	switch (stage[x][y].type){
+		case "bitadd":
+			draw_bitadd(RED);
+			break;
 		case "branch":
 			draw_branch();
 			break;
@@ -353,6 +361,21 @@ function draw_branch(){
 	ctx.lineTo(grid_size,grid_size);
 	ctx.closePath();
 	ctx.fill();	
+}
+
+function draw_bitadd(color, direction){
+	ctx.lineWidth = 10;
+	ctx.strokeStyle = color;
+	ctx.beginPath();
+	ctx.moveTo(grid_size/2,0);
+	ctx.lineTo(grid_size/2,grid_size);
+	ctx.closePath();
+	ctx.stroke();
+
+	ctx.moveTo(0, grid_size/2);
+	ctx.lineTo(grid_size,grid_size/2);
+	ctx.closePath();
+	ctx.stroke();	
 }
 
 /* clear this square by setting area to white */
