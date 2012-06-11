@@ -12,22 +12,25 @@ var GREEN  = "#0f0";
 var RED    = "#f00";
 var YELLOW = "#ff0";
 
-var stage = new Array();	/* status of stage - all details stored here		*/
-var store = new Array();	/* status of input 					*/
+var stage = new Array();	/* status of stage - all details stored here	*/
+var store = new Array();	/* status of input 								*/
 
-var stage_rows = 8;		/* number of rows on stage				*/
-var stage_cols = 9;		/* number of columns on stage				*/
-var store_bit_count = 10;	/* number of bits stored in machine			*/
+var bit_x = null;		/* location of current bit in grid				*/
+var bit_y = null;		/* see above - 0,0 is top left of grid			*/
 
-var input_count = 10;		/* number of input bits 				*/
+var stage_rows = 8;			/* number of rows on stage						*/
+var stage_cols = 9;			/* number of columns on stage					*/
+var store_bit_count = 10;	/* number of bits stored in machine				*/
 
-var grid_status = 1; 		/* turn grid lines on and off 				*/
-var grid_size = 50;		/* size in pixels of grid lines - both X and Y		*/
-var canvas;			/* object id of canvas tag 				*/
-var canvas_input;		/* object id of input tag 				*/
+var input_count = 10;		/* number of input bits							*/
 
-var ctx;			/* context of canvas					*/
-var input;			/* context of input canvas 				*/
+var grid_status = 1; 		/* turn grid lines on and off					*/
+var grid_size = 50;			/* size in pixels of grid lines - both X and Y	*/
+var canvas;					/* object id of canvas tag 						*/
+var canvas_input;			/* object id of input tag						*/
+
+var ctx;					/* context of canvas							*/
+var input;					/* context of input canvas						*/
 
 /* each square on grid has an associated block of data tied to it */
 function grid(type, bit, dir, col){
@@ -85,15 +88,32 @@ function init_stage(){
 		}
 	}
 	stage[5][0].type = "input";
-	stage[5][0].bit = "red";
 	stage[5][1].type = "branch";
 	stage[5][2].type = "bus";
+	stage[5][2].dir = 1;
+	stage[6][2].type = "bus";
+	stage[6][2].dir = 3;
+	stage[6][1].type = "bus";
+	stage[6][1].dir = 2;
+
 	stage[5][6].type = "branch";
 	stage[5][7].type = "branch";
 	stage[5][8].type = "output";
 
 	stage[0][1].type = "bus";
 	stage[0][1].dir = 1;
+	
+	stage[5][3].type = "bitadd";
+	stage[5][3].col = "red";
+	
+	stage[5][4].type = "bus";
+	stage[5][4].dir = 4;
+	
+	stage[6][4].type = "bus";
+	stage[6][4].dir = 3;
+
+	stage[6][3].type = "bus";
+	stage[6][3].dir = 2;
 
 	stage[0][2].type = "bus";
 	stage[0][2].dir = 2;
@@ -101,24 +121,121 @@ function init_stage(){
 	stage[0][3].dir = 3;
 	stage[0][4].type = "bus";
 	stage[0][4].dir = 4;
-
 	//test_types();
 }
 
 /* moves automata to next position */
 function next_move(){
+	// if input is empty - get next bit
+	if(!bit_x){
+		move_getbit();
+	} else {
+		// determine what type of machine part we are on
+		switch(stage[bit_x][bit_y].type){
+			case "bitadd":
+				move_bitadd();
+				break;
+			case "branch":
+				move_branch();
+				break;
+			case "bus":
+				move_bus();
+				break;
+			case "input":
+				move_input();
+				break;
+			case "output":
+				move_output();
+				break;
+			default:
+				alert("Unknown entity.");
+		};
+	}
+}
 
-	// determine what type of machine part we are on 
+function move_getbit(){
+	stage[5][0].bit = store.shift();
+	draw_tape();
+	draw_tile(5,0);
+	bit_x = 5; bit_y = 0;
+}
 
-	// if we are on a bus move to next grid
+function move_bitadd(){
+	// TODO: temove this switch statement
+	store.push(stage[bit_x][bit_y].col);
+	stage[bit_x][bit_y+1].bit = stage[bit_x][bit_y].bit;
+	stage[bit_x][bit_y].bit = "";
+	draw_tile(bit_x,bit_y);
+	draw_tile(bit_x,bit_y+1);
+	draw_tape();
+	bit_y++;
+}
 
-	// if we are on an input, make next bit dissappear from tape
-	// place bit on input
+// determine which direction to move and move there
+function move_branch(){
+	if(stage[bit_x][bit_y].bit == BLUE){
+		stage[bit_x+1][bit_y].bit = stage[bit_x][bit_y].bit;
+		stage[bit_x][bit_y].bit = "";
+		draw_tile(bit_x,bit_y);
+		draw_tile(bit_x+1,bit_y);
+		bit_x++;
+	} else if (stage[bit_x][bit_y].bit == RED){
+		stage[bit_x-1][bit_y].bit = stage[bit_x][bit_y].bit;
+		stage[bit_x][bit_y].bit = "";
+		draw_tile(bit_x,bit_y);
+		draw_tile(bit_x-1,bit_y);
+		bit_x--;	
+	} else {
+		stage[bit_x][bit_y+1].bit = stage[bit_x][bit_y].bit;
+		stage[bit_x][bit_y].bit = "";
+		draw_tile(bit_x,bit_y);
+		draw_tile(bit_x,bit_y+1);
+		bit_y++;
+	}
+}
 
-	// if we are on a branch, determine which direction to move
-	// and move there
+function move_bus(){
+	var x = 0, y = 0;
+	// 1= DOWN; 2= LEFT; 3 = UP; 4 = LEFT
+	switch(stage[bit_x][bit_y].dir){
+		case 1:
+			y++;
+			break;
+		case 2:
+			x--;
+			break;
+		case 3:
+			y--;
+			break;
+		case 4:
+			x++;
+			break;
+		default:
+			alert("Unknown bus direction.");
+	};
+	stage[bit_x+x][bit_y+y].bit = stage[bit_x][bit_y].bit;
+	stage[bit_x][bit_y].bit = "";
+	draw_tile(bit_x,bit_y);
+	bit_y += y; bit_x += x;
+	draw_tile(bit_x,bit_y);
+}
 
-	// if we are on an output, remove bit and move to an input
+function move_input(){
+	var i, j;
+	// look for entity next to input.
+	// walk around clockwise until one is found
+	if(stage[bit_x][bit_y+1].type){
+		stage[bit_x][bit_y+1].bit = stage[bit_x][bit_y].bit;
+		stage[bit_x][bit_y].bit = "";
+		draw_tile(bit_x,bit_y);
+		draw_tile(bit_x,bit_y+1);
+		bit_y++;
+	} else { alert("Cannot continue: No connection to input."); }
+}
+
+// if we are on an output, remove bit and move to an input
+function move_output(){
+
 }
 
 /* set initial values for input */
@@ -139,8 +256,7 @@ function draw_grid(){
 	ctx.strokeStyle = "#ccc";
 	ctx.lineWidth = 1;
 	/* draw vertical lines */
-	for(x = grid_size, y = 0, offset = window.innerWidth; x < window.innerWidth; x = x + grid_size)
-	{
+	for(x = grid_size, y = 0, offset = window.innerWidth; x < window.innerWidth; x = x + grid_size){
 		ctx.beginPath();
 		ctx.moveTo(x,y);
 		ctx.lineTo(x,y+offset);
@@ -148,8 +264,7 @@ function draw_grid(){
 		stage_cols++;
 	}
 	/* draw horizontal lines */
-	for(x = 0, y = grid_size, offset = window.innerWidth; y < window.innerWidth; y = y + grid_size)
-	{
+	for(x = 0, y = grid_size, offset = window.innerWidth; y < window.innerWidth; y = y + grid_size){
 		ctx.beginPath();
 		ctx.moveTo(x,y);
 		ctx.lineTo(x+offset,y);
@@ -165,8 +280,8 @@ this function can be used to refresh the screen at any time.
 function draw_stage(){
 	var x; var y;
 	/* loop through all grids on stage, drawing contents */
-	for(x=0; x < stage_cols; x++) {
-		for(y = 0; y < stage_rows; y++) {
+	for(x=0; x < stage_cols; x++){
+		for(y = 0; y < stage_rows; y++){
 			draw_tile(x,y);
 		}
 	}
@@ -184,7 +299,7 @@ function init_form(){
 	/* get width and height of window and set stage (canvas) with it. */
 	canvas.height = window.innerHeight-125;
 	canvas.width = window.innerWidth - 45;
-	if(grid_status) {draw_grid(); }
+	if(grid_status){draw_grid(); }
 	init_stage();
 	draw_stage();
 	init_input();
@@ -195,7 +310,7 @@ function init_form(){
 function cnvs_get_coordinates(e){
 	var x_offset = canvas.offsetLeft;
 	var y_offset = canvas.offsetTop;
-	if(canvas == 'undefined') { alert("Canvas parameter is undefined"); }
+	if(canvas == 'undefined'){ alert("Canvas parameter is undefined"); }
 	x_offset = e.clientX - x_offset;
 	y_offset = e.clientY - y_offset;
 	document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x_offset + "," + y_offset + ")";
@@ -206,8 +321,8 @@ function cnvs_get_coordinates(e){
 function draw_tape(){
 	var i = 0; var x = 50;
 	input.fillStyle = "#f00";
-	while(i < input_count){
-		if(store[i]) {
+	input.clearRect(0,0,579,100);
+	while(i < store.length){
 			input.beginPath();
 			input.fillStyle = store[i];
 			input.arc(x,25,20,0,TWO_PI,0);
@@ -218,7 +333,6 @@ function draw_tape(){
 			input.beginPath();
 			input.arc(x,25,20,0,TWO_PI,0);
 			input.stroke();
-		}
 		x += 50;
 		i++;
 	}
@@ -278,6 +392,10 @@ function draw_input(){
 /* a bus moves bits from one location to another */
 function draw_bus(dir){
 	var i = 0;
+	
+	ctx.fillStyle = "#fff";
+	ctx.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
+	
 	ctx.lineWidth = 2;
 	ctx.fillStyle = "#aaa";
 	ctx.strokeStyle = "#000";
@@ -413,13 +531,13 @@ function cnvs_clicked(e){}
 <body onLoad="init_form();">
 
 <div id="topsection">
-<!--
+
 <center>
 <button onClick='reset();'><img src="http://opentextbook.info/icons/32x32/resultset_first.png" title="Restart" alt="Restart"></button>
 &nbsp;&nbsp;
 <button onClick='step_back();'><img src="http://opentextbook.info/icons/32x32/resultset_previous.png" title="Step Back" alt="Step Back"></button>
 &nbsp;&nbsp;
-<button onClick='step_next();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png" title="Next Step" alt="Next Step"></button>
+<button onClick='next_move();'><img src="http://opentextbook.info/icons/32x32/resultset_next.png" title="Next Step" alt="Next Step"></button>
 &nbsp;&nbsp;
 <button onClick='run();'><img src="http://opentextbook.info/icons/32x32/resultset_last.png" title="Run" alt="Run"></button>
 &nbsp;&nbsp;
