@@ -89,8 +89,10 @@ function init_stage(){
 	}
 	stage[5][0].type = "input";
 	stage[5][1].type = "branch";
+
 	stage[5][2].type = "bus";
 	stage[5][2].dir = 1;
+
 	stage[6][2].type = "bus";
 	stage[6][2].dir = 3;
 	stage[6][1].type = "bus";
@@ -103,8 +105,8 @@ function init_stage(){
 	stage[0][1].type = "bus";
 	stage[0][1].dir = 1;
 	
-	stage[5][3].type = "bitadd";
-	stage[5][3].col = "red";
+	stage[5][3].type = "output";
+	//stage[5][3].col = "red";
 	
 	stage[5][4].type = "bus";
 	stage[5][4].dir = 4;
@@ -121,6 +123,10 @@ function init_stage(){
 	stage[0][3].dir = 3;
 	stage[0][4].type = "bus";
 	stage[0][4].dir = 4;
+
+	stage[5][1].type = "bus";
+	stage[5][1].dir = 1;
+
 	//test_types();
 }
 
@@ -235,7 +241,9 @@ function move_input(){
 
 // if we are on an output, remove bit and move to an input
 function move_output(){
-
+	stage[bit_x][bit_y].bit = "";
+	draw_tile(bit_x,bit_y);
+	bit_x = null; bit_y = null;
 }
 
 /* set initial values for input */
@@ -356,7 +364,7 @@ function draw_tile(x,y){
 			draw_input();
 			break;
 		case "output":
-			draw_input();
+			draw_output();
 			break;
 		default: clear_square();
 	};
@@ -389,13 +397,42 @@ function draw_input(){
 	ctx.fillRect(0,0,grid_size,grid_size);
 }
 
+function drawSpirograph(ctx,R,r,O){
+  var x1 = R-O;
+  var y1 = 0;
+  var i  = 1;
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  do {
+    if (i>20000) break;
+    var x2 = (R+r)*Math.cos(i*Math.PI/72) - (r+O)*Math.cos(((R+r)/r)*(i*Math.PI/72))
+    var y2 = (R+r)*Math.sin(i*Math.PI/72) - (r+O)*Math.sin(((R+r)/r)*(i*Math.PI/72))
+    ctx.lineTo(x2,y2);
+    x1 = x2;
+    y1 = y2;
+    i++;
+  } while (x2 != R-O && y2 != 0 );
+  ctx.stroke();
+}
+
+function draw_output(){
+	ctx.fillStyle = "#fff";
+	ctx.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
+
+	ctx.translate(grid_size/2,grid_size/2);
+	ctx.strokeStyle = "#d80";
+	ctx.lineWidth = 2;
+	drawSpirograph(ctx,9,2,7);
+	ctx.translate(-(grid_size/2),-(grid_size/2));
+}
+
 /* a bus moves bits from one location to another */
 function draw_bus(dir){
 	var i = 0;
-	
+
 	ctx.fillStyle = "#fff";
 	ctx.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
-	
+
 	ctx.lineWidth = 2;
 	ctx.fillStyle = "#aaa";
 	ctx.strokeStyle = "#000";
