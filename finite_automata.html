@@ -7,7 +7,9 @@
 var PI = 3.141592654;
 var TWO_PI = PI * 2;
 
+var BLACK  = "#000";
 var BLUE   = "#00f";
+var GRAY   = "#aaa";
 var GREEN  = "#0f0";
 var RED    = "#f00";
 var YELLOW = "#ff0";
@@ -15,8 +17,8 @@ var YELLOW = "#ff0";
 var stage = new Array();	/* status of stage - all details stored here	*/
 var store = new Array();	/* status of input 								*/
 
-var bit_x = null;		/* location of current bit in grid				*/
-var bit_y = null;		/* see above - 0,0 is top left of grid			*/
+var bit_x = null;			/* location of current bit in grid				*/
+var bit_y = null;			/* see above - 0,0 is top left of grid			*/
 
 var stage_rows = 8;			/* number of rows on stage						*/
 var stage_cols = 9;			/* number of columns on stage					*/
@@ -26,11 +28,16 @@ var input_count = 10;		/* number of input bits							*/
 
 var grid_status = 1; 		/* turn grid lines on and off					*/
 var grid_size = 50;			/* size in pixels of grid lines - both X and Y	*/
+
 var canvas;					/* object id of canvas tag 						*/
 var canvas_input;			/* object id of input tag						*/
+var canvas_control;			/* object id of control tag						*/
+
+var selected_obj = new grid("delete", '', '', '');
 
 var ctx;					/* context of canvas							*/
 var input;					/* context of input canvas						*/
+var control;				/* context of control canvas					*/
 
 /* each square on grid has an associated block of data tied to it */
 function grid(type, bit, dir, col){
@@ -88,22 +95,7 @@ function init_stage(){
 		}
 	}
 	stage[5][0].type = "input";
-	stage[5][1].type = "branch";
-
-	stage[5][2].type = "bus";
-	stage[5][2].dir = 1;
-
 	stage[5][8].type = "output";
-
-	stage[5][3].type = "output";
-	//stage[5][3].col = "red";
-	
-	stage[5][4].type = "bus";
-	stage[5][4].dir = 4;
-	
-	stage[5][1].type = "bus";
-	stage[5][1].dir = 1;
-
 	//test_types();
 }
 
@@ -296,6 +288,9 @@ function init_form(){
 
 	canvas_input = document.getElementById("input");
 	input = canvas_input.getContext("2d");
+	
+	canvas_control = document.getElementById("control");
+	control = canvas_control.getContext("2d");	
 
 	/* get width and height of window and set stage (canvas) with it. */
 	canvas.height = window.innerHeight-125;
@@ -305,6 +300,7 @@ function init_form(){
 	draw_stage();
 	init_input();
 	draw_tape();
+	draw_control();
 }
 
 /* returns coordinates of canvas in pixels */
@@ -337,17 +333,121 @@ function draw_tape(){
 		x += 50;
 		i++;
 	}
-	/* icons for each type */
-	input.save();
-	input.translate(0, grid_size);
-	draw_trash(input);
-	input.translate(grid_size, 0);
-	draw_bus(input, 1);
-	input.translate(grid_size, 0);
-	draw_branch(input);
-	input.translate(grid_size, 0);
-	draw_bitadd(input, GREEN);
-	input.restore();
+
+}
+
+function draw_control(){
+	control.scale(.75,.75);
+	control.fillStyle = "#aaa";
+	control.fillRect(0,0,779,220)
+
+	/* trash can */
+
+	control.save();
+	control.translate(grid_size, grid_size);
+	draw_trash(control);
+	control.restore();
+
+	control.save();
+	control.translate(grid_size*4, grid_size);
+	draw_bus(control, 1);
+
+	control.save();
+	control.translate(grid_size, 0); /* right */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(-grid_size, 0); /* left */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(0, grid_size); /* bottom */
+	draw_bit(control, BLACK);
+	control.restore();
+
+	control.save();
+	control.translate(0, -grid_size); /* top */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	/* branch icon red and blue */
+
+	control.restore();
+	control.translate(grid_size*7, grid_size);
+	draw_branch(control);
+
+	control.save();
+	control.translate(grid_size, 0); /* right */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(-grid_size, 0); /* left */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(0, grid_size); /* bottom */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(0, -grid_size); /* top */
+	draw_bit(control, BLACK);
+	control.restore();
+	
+	/* branch icon green and yellow */
+
+	control.restore();
+	control.translate(grid_size*3, 0);
+	draw_branch(control);
+
+	control.save();
+	control.translate(grid_size, 0); /* right */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(-grid_size, 0); /* left */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(0, grid_size); /* bottom */
+	draw_bit(control, GRAY);
+	control.restore();
+
+	control.save();
+	control.translate(0, -grid_size); /* top */
+	draw_bit(control, BLACK);
+	control.restore();
+	
+	/* bit add */
+
+	control.translate(grid_size*3, 0);
+	draw_bitadd(control, GREEN);
+	
+	control.save();
+	control.translate(grid_size, 0); /* right */
+	draw_bit(control, RED);
+	control.restore();
+
+	control.save();
+	control.translate(-grid_size, 0); /* left */
+	draw_bit(control, BLUE);
+	control.restore();
+
+	control.save();
+	control.translate(0, grid_size); /* bottom */
+	draw_bit(control, GREEN);
+	control.restore();
+
+	control.save();
+	control.translate(0, -grid_size); /* top */
+	draw_bit(control, YELLOW);
+	control.restore();	
 }
 
 /* (re)draws any map tile on grid */
@@ -594,7 +694,7 @@ function cnvs_clicked(e){}
 </style>
 
 <body onLoad="init_form();">
-
+<center><h2>Finite Automata</h2></center>
 <div id="topsection">
 
 <center>
@@ -619,9 +719,10 @@ function cnvs_clicked(e){}
 
 </div>
 
-<div id="xycoordinates">Coordinates:</div>
-<canvas id="input" width="579" height="120"></canvas>
-<canvas id="stage" width="579" height="770" onmousemove="cnvs_get_coordinates(event)" onclick="cnvs_clicked(event);">
+<!--<div id="xycoordinates">Coordinates:</div>-->
+<canvas id="input" width="579" height="120"></canvas><br>
+<canvas id="control" width="779" height="220"></canvas>
+<canvas id="stage" width="579" height="770" onclick="cnvs_clicked(event);">
 Your browser does not support HTML5 Canvas.
 </canvas>
 
