@@ -93,37 +93,14 @@ function init_stage(){
 	stage[5][2].type = "bus";
 	stage[5][2].dir = 1;
 
-	stage[6][2].type = "bus";
-	stage[6][2].dir = 3;
-	stage[6][1].type = "bus";
-	stage[6][1].dir = 2;
-
-	stage[5][6].type = "branch";
-	stage[5][7].type = "branch";
 	stage[5][8].type = "output";
 
-	stage[0][1].type = "bus";
-	stage[0][1].dir = 1;
-	
 	stage[5][3].type = "output";
 	//stage[5][3].col = "red";
 	
 	stage[5][4].type = "bus";
 	stage[5][4].dir = 4;
 	
-	stage[6][4].type = "bus";
-	stage[6][4].dir = 3;
-
-	stage[6][3].type = "bus";
-	stage[6][3].dir = 2;
-
-	stage[0][2].type = "bitadd";
-	stage[0][2].col = GREEN;
-	stage[0][3].type = "bus";
-	stage[0][3].dir = 3;
-	stage[0][4].type = "bus";
-	stage[0][4].dir = 4;
-
 	stage[5][1].type = "bus";
 	stage[5][1].dir = 1;
 
@@ -363,7 +340,13 @@ function draw_tape(){
 	/* icons for each type */
 	input.save();
 	input.translate(0, grid_size);
-	draw_trash();
+	draw_trash(input);
+	input.translate(grid_size, 0);
+	draw_bus(input, 1);
+	input.translate(grid_size, 0);
+	draw_branch(input);
+	input.translate(grid_size, 0);
+	draw_bitadd(input, GREEN);
 	input.restore();
 }
 
@@ -373,74 +356,73 @@ function draw_tile(x,y){
 	ctx.translate(grid_size * x, grid_size * y);
 	switch (stage[x][y].type){
 		case "bitadd":
-			draw_bitadd(stage[x][y].col);
+			draw_bitadd(ctx, stage[x][y].col);
 			break;
 		case "branch":
-			draw_branch();
+			draw_branch(ctx);
 			break;
 		case "bus":
-			draw_bus(stage[x][y].dir);
+			draw_bus(ctx, stage[x][y].dir);
 			break;
 		case "input":
-			draw_input();
+			draw_input(ctx);
 			break;
 		case "output":
-			draw_output();
+			draw_output(ctx);
 			break;
-		default: clear_square();
+		default: clear_square(ctx);
 	};
-
-	if(stage[x][y].bit){ draw_bit(stage[x][y].bit); }
+	if(stage[x][y].bit){ draw_bit(ctx, stage[x][y].bit); }
 	ctx.restore();
 }
 
-function draw_trash(){
-	input.strokeStyle = "#000";
-	input.lineCap = "round";
-	input.lineWidth = 12;
-	input.beginPath();
-	input.moveTo(10,10);
-	input.lineTo(grid_size-10,grid_size-10);
-	input.stroke();
-	input.beginPath();
-	input.moveTo(10, grid_size-10);
-	input.lineTo(grid_size-10, 10);
-	input.stroke();
+function draw_trash(canvas){
+	canvas.strokeStyle = "#000";
+	canvas.lineCap = "round";
+	canvas.lineWidth = 12;
+	canvas.beginPath();
+	canvas.moveTo(10,10);
+	canvas.lineTo(grid_size-10,grid_size-10);
+	canvas.stroke();
+	canvas.beginPath();
+	canvas.moveTo(10, grid_size-10);
+	canvas.lineTo(grid_size-10, 10);
+	canvas.stroke();
 
-	input.strokeStyle = "#f00";
-	input.lineWidth = 8;
-	input.beginPath();
-	input.moveTo(10,10);
-	input.lineTo(grid_size-10,grid_size-10);
-	input.stroke();
-	input.beginPath();
-	input.moveTo(10, grid_size-10);
-	input.lineTo(grid_size-10, 10);
-	input.stroke();
+	canvas.strokeStyle = "#f00";
+	canvas.lineWidth = 8;
+	canvas.beginPath();
+	canvas.moveTo(10,10);
+	canvas.lineTo(grid_size-10,grid_size-10);
+	canvas.stroke();
+	canvas.beginPath();
+	canvas.moveTo(10, grid_size-10);
+	canvas.lineTo(grid_size-10, 10);
+	canvas.stroke();
 }
 
 /* draws small bit of correct color on grid */
-function draw_bit(color){
-	ctx.fillStyle = "#f00";
-	ctx.beginPath();
-	ctx.fillStyle = color;
-	ctx.arc(25,25,10,0,TWO_PI,0);
-	ctx.fill();
+function draw_bit(canvas, color){
+	canvas.fillStyle = "#f00";
+	canvas.beginPath();
+	canvas.fillStyle = color;
+	canvas.arc(25,25,10,0,TWO_PI,0);
+	canvas.fill();
 
-	ctx.strokeStyle = "#000";
-	ctx.lineWidth = 2;
-	ctx.beginPath();
-	ctx.arc(25,25,10,0,TWO_PI,0);
-	ctx.stroke();
+	canvas.strokeStyle = "#000";
+	canvas.lineWidth = 2;
+	canvas.beginPath();
+	canvas.arc(25,25,10,0,TWO_PI,0);
+	canvas.stroke();
 }
 
 /* draw gray square with black outline */
-function draw_input(){
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = "#000";
-	ctx.strokeRect(0,0,grid_size,grid_size);
-	ctx.fillStyle = "#aaa";
-	ctx.fillRect(0,0,grid_size,grid_size);
+function draw_input(canvas){
+	canvas.lineWidth = 1;
+	canvas.strokeStyle = "#000";
+	canvas.strokeRect(0,0,grid_size,grid_size);
+	canvas.fillStyle = "#aaa";
+	canvas.fillRect(0,0,grid_size,grid_size);
 }
 
 function drawSpirograph(ctx,R,r,O){
@@ -461,145 +443,145 @@ function drawSpirograph(ctx,R,r,O){
   ctx.stroke();
 }
 
-function draw_output(){
-	ctx.fillStyle = "#fff";
-	ctx.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
+function draw_output(canvas){
+	canvas.fillStyle = "#fff";
+	canvas.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
 
-	ctx.translate(grid_size/2,grid_size/2);
-	ctx.strokeStyle = "#d80";
-	ctx.lineWidth = 2;
-	drawSpirograph(ctx,9,2,7);
-	ctx.translate(-(grid_size/2),-(grid_size/2));
+	canvas.translate(grid_size/2,grid_size/2);
+	canvas.strokeStyle = "#d80";
+	canvas.lineWidth = 2;
+	drawSpirograph(canvas,9,2,7);
+	canvas.translate(-(grid_size/2),-(grid_size/2));
 }
 
 /* a bus moves bits from one location to another */
-function draw_bus(dir){
+function draw_bus(canvas, dir){
 	var i = 0;
 
-	ctx.fillStyle = "#fff";
-	ctx.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
+	canvas.fillStyle = "#fff";
+	canvas.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
 
-	ctx.lineWidth = 2;
-	ctx.fillStyle = "#aaa";
-	ctx.strokeStyle = "#000";
+	canvas.lineWidth = 2;
+	canvas.fillStyle = "#aaa";
+	canvas.strokeStyle = "#000";
 
 	switch(dir){
 		case 2:
-			ctx.translate(grid_size,0);
-			ctx.rotate(PI/2);
+			canvas.translate(grid_size,0);
+			canvas.rotate(PI/2);
 			break;
 		case 3:
-			ctx.translate(grid_size,grid_size);
-			ctx.rotate(PI);
+			canvas.translate(grid_size,grid_size);
+			canvas.rotate(PI);
 			break;
 		case 4:
-			ctx.translate(0,grid_size);
-			ctx.rotate(-PI/2);
+			canvas.translate(0,grid_size);
+			canvas.rotate(-PI/2);
 			break;
 	};
 
 	while(i < 2){
-		if(i == 1) { ctx.save(); ctx.translate(0, grid_size/2); }
-		ctx.beginPath();
-		ctx.moveTo(0,0);
-		ctx.lineTo(grid_size/2,grid_size/2);
-		ctx.lineTo(grid_size,0);
-		ctx.lineTo(grid_size/2,grid_size/4);
-		ctx.closePath();
-		ctx.fill();
+		if(i == 1) { canvas.save(); canvas.translate(0, grid_size/2); }
+		canvas.beginPath();
+		canvas.moveTo(0,0);
+		canvas.lineTo(grid_size/2,grid_size/2);
+		canvas.lineTo(grid_size,0);
+		canvas.lineTo(grid_size/2,grid_size/4);
+		canvas.closePath();
+		canvas.fill();
 
-		ctx.beginPath();
-		ctx.moveTo(0,0);
-		ctx.lineTo(grid_size/2,grid_size/2);
-		ctx.lineTo(grid_size,0);
-		ctx.lineTo(grid_size/2,grid_size/4);
-		ctx.closePath();
-		ctx.stroke();
-		if(i == 1) { ctx.restore(); }
+		canvas.beginPath();
+		canvas.moveTo(0,0);
+		canvas.lineTo(grid_size/2,grid_size/2);
+		canvas.lineTo(grid_size,0);
+		canvas.lineTo(grid_size/2,grid_size/4);
+		canvas.closePath();
+		canvas.stroke();
+		if(i == 1) { canvas.restore(); }
 		i++;
 	}
 }
 
 /* tiles branch movement of each bit */
-function draw_branch(){
+function draw_branch(canvas){
 	/* left */
-	ctx.lineWidth = 1;
-	ctx.fillStyle = "#f00";
-	ctx.beginPath(); 
-	ctx.moveTo(0,0);
-	ctx.lineTo(grid_size/2,grid_size/2);
-	ctx.lineTo(0,grid_size);
-	ctx.closePath();
-	ctx.fill();
+	canvas.lineWidth = 1;
+	canvas.fillStyle = "#f00";
+	canvas.beginPath(); 
+	canvas.moveTo(0,0);
+	canvas.lineTo(grid_size/2,grid_size/2);
+	canvas.lineTo(0,grid_size);
+	canvas.closePath();
+	canvas.fill();
 
 	 /* top */
-	ctx.fillStyle = "#000";
-	ctx.beginPath();
-	ctx.moveTo(0,0)
-	ctx.lineTo(grid_size/2,grid_size/2);
-	ctx.lineTo(grid_size,0);
-	ctx.closePath();
-	ctx.fill();
+	canvas.fillStyle = "#000";
+	canvas.beginPath();
+	canvas.moveTo(0,0)
+	canvas.lineTo(grid_size/2,grid_size/2);
+	canvas.lineTo(grid_size,0);
+	canvas.closePath();
+	canvas.fill();
 	
 
 	 /* right */
-	ctx.fillStyle = "#00f";
-	ctx.beginPath(); 
-	ctx.moveTo(grid_size,0);
-	ctx.lineTo(grid_size/2,grid_size/2);
-	ctx.lineTo(grid_size,grid_size);
-	ctx.closePath();
-	ctx.fill();
+	canvas.fillStyle = "#00f";
+	canvas.beginPath(); 
+	canvas.moveTo(grid_size,0);
+	canvas.lineTo(grid_size/2,grid_size/2);
+	canvas.lineTo(grid_size,grid_size);
+	canvas.closePath();
+	canvas.fill();
 
 	 /* bottom */
-	ctx.fillStyle = "#aaa";
-	ctx.beginPath();
-	ctx.moveTo(0,grid_size)
-	ctx.lineTo(grid_size/2,grid_size/2);
-	ctx.lineTo(grid_size,grid_size);
-	ctx.closePath();
-	ctx.fill();	
+	canvas.fillStyle = "#aaa";
+	canvas.beginPath();
+	canvas.moveTo(0,grid_size)
+	canvas.lineTo(grid_size/2,grid_size/2);
+	canvas.lineTo(grid_size,grid_size);
+	canvas.closePath();
+	canvas.fill();	
 }
 
-function draw_bitadd(color){
+function draw_bitadd(canvas, color){
 	var i = 0;
 	while(i < 2){
 		if(i==1){
-			ctx.strokeStyle = color;
-			ctx.lineWidth = 10;
+			canvas.strokeStyle = color;
+			canvas.lineWidth = 10;
 		} else {
-			ctx.strokeStyle = "#000";
-			ctx.lineWidth = 15;		
+			canvas.strokeStyle = "#000";
+			canvas.lineWidth = 15;		
 		}
-		ctx.beginPath();
-		ctx.moveTo(grid_size/2,0);
-		ctx.lineTo(grid_size/2,grid_size);
-		ctx.closePath();
-		ctx.stroke();
+		canvas.beginPath();
+		canvas.moveTo(grid_size/2,0);
+		canvas.lineTo(grid_size/2,grid_size);
+		canvas.closePath();
+		canvas.stroke();
 
-		ctx.beginPath();
-		ctx.moveTo(0, grid_size/2);
-		ctx.lineTo(grid_size,grid_size/2);
-		ctx.closePath();
-		ctx.stroke();
+		canvas.beginPath();
+		canvas.moveTo(0, grid_size/2);
+		canvas.lineTo(grid_size,grid_size/2);
+		canvas.closePath();
+		canvas.stroke();
 		i++;
 	}
-	ctx.strokeStyle = "#000";
-	ctx.lineWidth = 1;
-	ctx.beginPath();
-	ctx.moveTo(0, 0);
-	ctx.lineTo(0,grid_size);
-	ctx.lineTo(grid_size,grid_size);
-	ctx.lineTo(grid_size,0);
-	ctx.lineTo(0,0);
-	ctx.closePath();
-	ctx.stroke();
+	canvas.strokeStyle = "#000";
+	canvas.lineWidth = 1;
+	canvas.beginPath();
+	canvas.moveTo(0, 0);
+	canvas.lineTo(0,grid_size);
+	canvas.lineTo(grid_size,grid_size);
+	canvas.lineTo(grid_size,0);
+	canvas.lineTo(0,0);
+	canvas.closePath();
+	canvas.stroke();
 }
 
 /* clear this square by setting area to white */
-function clear_square(){
-	ctx.fillStyle = "#fff";
-	ctx.fillRect(1,1,grid_size-2,grid_size-2);
+function clear_square(canvas){
+	canvas.fillStyle = "#fff";
+	canvas.fillRect(1,1,grid_size-2,grid_size-2);
 }
 
 /* canvas has been clicked find out which grid and make correct change to square if needed. */
@@ -638,7 +620,7 @@ function cnvs_clicked(e){}
 </div>
 
 <div id="xycoordinates">Coordinates:</div>
-<canvas id="input" width="579" height="100"></canvas>
+<canvas id="input" width="579" height="120"></canvas>
 <canvas id="stage" width="579" height="770" onmousemove="cnvs_get_coordinates(event)" onclick="cnvs_clicked(event);">
 Your browser does not support HTML5 Canvas.
 </canvas>
