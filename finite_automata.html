@@ -117,8 +117,8 @@ function init_stage(){
 	stage[6][3].type = "bus";
 	stage[6][3].dir = 2;
 
-	stage[0][2].type = "bus";
-	stage[0][2].dir = 2;
+	stage[0][2].type = "bitadd";
+	stage[0][2].col = GREEN;
 	stage[0][3].type = "bus";
 	stage[0][3].dir = 3;
 	stage[0][4].type = "bus";
@@ -295,6 +295,22 @@ function draw_stage(){
 	}
 }
 
+/* delete item from stage */
+function stage_delete(){
+
+}
+
+/* add current item to stage at clicked location */
+function stage_add(){
+
+}
+
+/* select this item as next item to be placed */
+function stage_select(){
+
+
+}
+
 function init_form(){
 	var x; var y;
 	/* initalize canvas element for use */
@@ -344,6 +360,11 @@ function draw_tape(){
 		x += 50;
 		i++;
 	}
+	/* icons for each type */
+	input.save();
+	input.translate(0, grid_size);
+	draw_trash();
+	input.restore();
 }
 
 /* (re)draws any map tile on grid */
@@ -371,6 +392,31 @@ function draw_tile(x,y){
 
 	if(stage[x][y].bit){ draw_bit(stage[x][y].bit); }
 	ctx.restore();
+}
+
+function draw_trash(){
+	input.strokeStyle = "#000";
+	input.lineCap = "round";
+	input.lineWidth = 12;
+	input.beginPath();
+	input.moveTo(10,10);
+	input.lineTo(grid_size-10,grid_size-10);
+	input.stroke();
+	input.beginPath();
+	input.moveTo(10, grid_size-10);
+	input.lineTo(grid_size-10, 10);
+	input.stroke();
+
+	input.strokeStyle = "#f00";
+	input.lineWidth = 8;
+	input.beginPath();
+	input.moveTo(10,10);
+	input.lineTo(grid_size-10,grid_size-10);
+	input.stroke();
+	input.beginPath();
+	input.moveTo(10, grid_size-10);
+	input.lineTo(grid_size-10, 10);
+	input.stroke();
 }
 
 /* draws small bit of correct color on grid */
