@@ -28,6 +28,8 @@ var input_count = 10;		/* number of input bits							*/
 
 var grid_status = 1; 		/* turn grid lines on and off					*/
 var grid_size = 50;			/* size in pixels of grid lines - both X and Y	*/
+var cont_selected = null;	/* current tool selected 						*/
+var cont_direction = null;	/* direction of current tool					*/
 
 var canvas;					/* object id of canvas tag 						*/
 var canvas_input;			/* object id of input tag						*/
@@ -96,6 +98,11 @@ function init_stage(){
 	}
 	stage[5][0].type = "input";
 	stage[5][8].type = "output";
+
+	stage[1][1].type = "bus";
+	stage[1][1].dir = 1;
+	
+	
 	//test_types();
 }
 
@@ -304,14 +311,65 @@ function init_form(){
 }
 
 /* returns coordinates of canvas in pixels */
-function cnvs_get_coordinates(e){
+function cnvs_get_coordinates(canvas, e){
 	var x_offset = canvas.offsetLeft;
 	var y_offset = canvas.offsetTop;
 	if(canvas == 'undefined'){ alert("Canvas parameter is undefined"); }
 	x_offset = e.clientX - x_offset;
 	y_offset = e.clientY - y_offset;
-	document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x_offset + "," + y_offset + ")";
+	//document.getElementById("xycoordinates").innerHTML="Coordinates: (" + x_offset + "," + y_offset + ")";
 	return [x_offset,y_offset];
+}
+
+/* canvas has been clicked find out which grid and make correct change to square if needed. */
+function cont_clicked(e){
+	var coords = cnvs_get_coordinates(canvas_control, e);
+	var x_pos = Math.floor(coords[0] / grid_size);
+	var y_pos = Math.floor(coords[1] / grid_size);
+	//alert(x_pos + "," + y_pos);
+
+	// bit add
+	if(x_pos >= 12 && x_pos <= 14){
+		selected_obj.type = "bitadd";
+		if(x_pos == 13 && y_pos == 2){ selected_obj.dir = 1; }
+		if(x_pos == 12 && y_pos == 1){ selected_obj.dir = 2; }
+		if(x_pos == 13 && y_pos == 0){ selected_obj.dir = 3; }
+		if(x_pos == 14 && y_pos == 1){ selected_obj.dir = 4; }		
+	}
+
+	// branch (red and blue)
+	if(x_pos >= 6 && x_pos <= 8){
+		selected_obj.type = "branch_rb";
+		if(x_pos == 7 && y_pos == 2){ selected_obj.dir = 1; }
+		if(x_pos == 6 && y_pos == 1){ selected_obj.dir = 2; }
+		if(x_pos == 7 && y_pos == 0){ selected_obj.dir = 3; }
+		if(x_pos == 8 && y_pos == 1){ selected_obj.dir = 4;	}
+	}
+
+	// branch (yellow and greeen)
+	if(x_pos >= 9 && x_pos <= 11){
+		selected_obj.type = "branch_yg";
+		if(x_pos == 10 && y_pos == 2){ selected_obj.dir = 1; }
+		if(x_pos == 9  && y_pos == 1){ selected_obj.dir = 2; }
+		if(x_pos == 10 && y_pos == 0){ selected_obj.dir = 3; }
+		if(x_pos == 11 && y_pos == 1){ selected_obj.dir = 4; }
+	}
+
+	// bus button
+	if(x_pos >= 3 && x_pos <= 5){
+		selected_obj.type = "bus";
+		if(x_pos == 4 && y_pos == 2){ selected_obj.dir = 1; }
+		if(x_pos == 3 && y_pos == 1){ selected_obj.dir = 2; }
+		if(x_pos == 4 && y_pos == 0){ selected_obj.dir = 3; }		
+		if(x_pos == 5 && y_pos == 1){ selected_obj.dir = 4; }
+	}
+	
+	// delete button
+	if(x_pos >= 0 && x_pos <= 2){
+		selected_obj.type = "delete";
+	}
+
+	draw_control();
 }
 
 /* move through tape and draw bits */
@@ -337,8 +395,8 @@ function draw_tape(){
 }
 
 function draw_control(){
-	control.scale(.75,.75);
-	control.fillStyle = "#aaa";
+	//control.scale(.75,.75);
+	control.fillStyle = "#fff";
 	control.fillRect(0,0,779,220)
 
 	/* trash can */
@@ -350,7 +408,7 @@ function draw_control(){
 
 	control.save();
 	control.translate(grid_size*4, grid_size);
-	draw_bus(control, 1);
+	draw_bus(control, selected_obj.dir);
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
@@ -447,7 +505,34 @@ function draw_control(){
 	control.save();
 	control.translate(0, -grid_size); /* top */
 	draw_bit(control, YELLOW);
-	control.restore();	
+	control.restore();
+
+	/* highlight currenly selected tool */
+	control.setTransform(1, 0, 0, 1, 0, 0);
+	switch(selected_obj.type){
+		case "bitadd":
+			draw_control_highlight(grid_size*12,0,grid_size*3,grid_size*3);
+			break;
+		case "branch_rb":
+			draw_control_highlight(grid_size*6,0,grid_size*3,grid_size*3);
+			break;
+		case "branch_yg":
+			draw_control_highlight(grid_size*9,0,grid_size*3,grid_size*3);
+			break;
+		case "bus":
+			draw_control_highlight(grid_size*3,0,grid_size*3,grid_size*3);
+			break;
+		case "delete":
+			draw_control_highlight(0,0,grid_size*3,grid_size*3);
+			break;
+	};
+}
+
+function draw_control_highlight(x_start, y_start, x_stop, y_stop){
+	control.lineWidth = 5;
+	control.strokeStyle = "#000";
+	control.strokeRect(x_start,y_start,x_stop,y_stop);
+	control.stroke;
 }
 
 /* (re)draws any map tile on grid */
@@ -721,7 +806,7 @@ function cnvs_clicked(e){}
 
 <!--<div id="xycoordinates">Coordinates:</div>-->
 <canvas id="input" width="579" height="120"></canvas><br>
-<canvas id="control" width="779" height="220"></canvas>
+<canvas id="control" width="779" height="220" onClick="cont_clicked(event);"></canvas>
 <canvas id="stage" width="579" height="770" onclick="cnvs_clicked(event);">
 Your browser does not support HTML5 Canvas.
 </canvas>
