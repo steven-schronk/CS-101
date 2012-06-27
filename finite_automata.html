@@ -35,11 +35,19 @@ var canvas;					/* object id of canvas tag 						*/
 var canvas_input;			/* object id of input tag						*/
 var canvas_control;			/* object id of control tag						*/
 
-var selected_obj = new grid("delete", '', '', '');
+var control_panel = new panel("delete", GREEN, '1', '1', '1');
 
 var ctx;					/* context of canvas							*/
 var input;					/* context of input canvas						*/
 var control;				/* context of control canvas					*/
+
+function panel(selected, bitadd_col, branch_rb_dir, branch_yg_dir, bus_dir){ 
+	this.selected		= selected;			/* current machine part selected					*/
+	this.bitadd_col 	= bitadd_col;		/* color of bitadd in control panel 				*/
+	this.branch_rb_dir  = branch_rb_dir;	/* direction of red blue branch in control panel	*/
+	this.branch_yg_dir  = branch_yg_dir;
+	this.bus_dir 		= bus_dir;
+}
 
 /* each square on grid has an associated block of data tied to it */
 function grid(type, bit, dir, col){
@@ -330,43 +338,43 @@ function cont_clicked(e){
 
 	// bit add
 	if(x_pos >= 12 && x_pos <= 14){
-		selected_obj.type = "bitadd";
-		if(x_pos == 13 && y_pos == 2){ selected_obj.dir = 1; }
-		if(x_pos == 12 && y_pos == 1){ selected_obj.dir = 2; }
-		if(x_pos == 13 && y_pos == 0){ selected_obj.dir = 3; }
-		if(x_pos == 14 && y_pos == 1){ selected_obj.dir = 4; }		
+		control_panel.selected = "bitadd";
+		if(x_pos == 13 && y_pos == 2){ control_panel.bitadd_col = GREEN; }
+		if(x_pos == 12 && y_pos == 1){ control_panel.bitadd_col = BLUE; }
+		if(x_pos == 13 && y_pos == 0){ control_panel.bitadd_col = YELLOW; }
+		if(x_pos == 14 && y_pos == 1){ control_panel.bitadd_col = RED; }		
 	}
 
 	// branch (red and blue)
 	if(x_pos >= 6 && x_pos <= 8){
-		selected_obj.type = "branch_rb";
-		if(x_pos == 7 && y_pos == 2){ selected_obj.dir = 1; }
-		if(x_pos == 6 && y_pos == 1){ selected_obj.dir = 2; }
-		if(x_pos == 7 && y_pos == 0){ selected_obj.dir = 3; }
-		if(x_pos == 8 && y_pos == 1){ selected_obj.dir = 4;	}
+		control_panel.selected = "branch_rb";
+		if(x_pos == 7 && y_pos == 2){ control_panel.branch_rb_dir = 1; }
+		if(x_pos == 6 && y_pos == 1){ control_panel.branch_rb_dir = 2; }
+		if(x_pos == 7 && y_pos == 0){ control_panel.branch_rb_dir = 3; }
+		if(x_pos == 8 && y_pos == 1){ control_panel.branch_rb_dir = 4;	}
 	}
 
 	// branch (yellow and greeen)
 	if(x_pos >= 9 && x_pos <= 11){
-		selected_obj.type = "branch_yg";
-		if(x_pos == 10 && y_pos == 2){ selected_obj.dir = 1; }
-		if(x_pos == 9  && y_pos == 1){ selected_obj.dir = 2; }
-		if(x_pos == 10 && y_pos == 0){ selected_obj.dir = 3; }
-		if(x_pos == 11 && y_pos == 1){ selected_obj.dir = 4; }
+		control_panel.selected = "branch_yg";
+		if(x_pos == 10 && y_pos == 2){ control_panel.branch_yg_dir = 1; }
+		if(x_pos == 9  && y_pos == 1){ control_panel.branch_yg_dir = 2; }
+		if(x_pos == 10 && y_pos == 0){ control_panel.branch_yg_dir = 3; }
+		if(x_pos == 11 && y_pos == 1){ control_panel.branch_yg_dir = 4; }
 	}
 
 	// bus button
 	if(x_pos >= 3 && x_pos <= 5){
-		selected_obj.type = "bus";
-		if(x_pos == 4 && y_pos == 2){ selected_obj.dir = 1; }
-		if(x_pos == 3 && y_pos == 1){ selected_obj.dir = 2; }
-		if(x_pos == 4 && y_pos == 0){ selected_obj.dir = 3; }		
-		if(x_pos == 5 && y_pos == 1){ selected_obj.dir = 4; }
+		control_panel.selected = "bus";
+		if(x_pos == 4 && y_pos == 2){ control_panel.bus_dir = 1; }
+		if(x_pos == 3 && y_pos == 1){ control_panel.bus_dir = 2; }
+		if(x_pos == 4 && y_pos == 0){ control_panel.bus_dir = 3; }		
+		if(x_pos == 5 && y_pos == 1){ control_panel.bus_dir = 4; }
 	}
 	
 	// delete button
 	if(x_pos >= 0 && x_pos <= 2){
-		selected_obj.type = "delete";
+		control_panel.selected = "delete";
 	}
 
 	draw_control();
@@ -408,7 +416,7 @@ function draw_control(){
 
 	control.save();
 	control.translate(grid_size*4, grid_size);
-	draw_bus(control, selected_obj.dir);
+	draw_bus(control, control_panel.bus_dir);
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
@@ -485,8 +493,8 @@ function draw_control(){
 	/* bit add */
 
 	control.translate(grid_size*3, 0);
-	draw_bitadd(control, GREEN);
-	
+	draw_bitadd(control, control_panel.bitadd_col);
+
 	control.save();
 	control.translate(grid_size, 0); /* right */
 	draw_bit(control, RED);
@@ -509,7 +517,7 @@ function draw_control(){
 
 	/* highlight currenly selected tool */
 	control.setTransform(1, 0, 0, 1, 0, 0);
-	switch(selected_obj.type){
+	switch(control_panel.selected){
 		case "bitadd":
 			draw_control_highlight(grid_size*12,0,grid_size*3,grid_size*3);
 			break;
@@ -702,12 +710,11 @@ function draw_branch(canvas){
 	 /* top */
 	canvas.fillStyle = "#000";
 	canvas.beginPath();
-	canvas.moveTo(0,0)
+	canvas.moveTo(0,0);
 	canvas.lineTo(grid_size/2,grid_size/2);
 	canvas.lineTo(grid_size,0);
 	canvas.closePath();
 	canvas.fill();
-	
 
 	 /* right */
 	canvas.fillStyle = "#00f";
@@ -721,11 +728,11 @@ function draw_branch(canvas){
 	 /* bottom */
 	canvas.fillStyle = "#aaa";
 	canvas.beginPath();
-	canvas.moveTo(0,grid_size)
+	canvas.moveTo(0,grid_size);
 	canvas.lineTo(grid_size/2,grid_size/2);
 	canvas.lineTo(grid_size,grid_size);
 	canvas.closePath();
-	canvas.fill();	
+	canvas.fill();
 }
 
 function draw_bitadd(canvas, color){
