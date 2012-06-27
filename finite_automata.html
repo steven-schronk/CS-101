@@ -442,7 +442,7 @@ function draw_control(){
 
 	control.restore();
 	control.translate(grid_size*7, grid_size);
-	draw_branch(control);
+	draw_branch(control, "branch_rb", control_panel.branch_rb_dir);
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
@@ -468,7 +468,7 @@ function draw_control(){
 
 	control.restore();
 	control.translate(grid_size*3, 0);
-	draw_branch(control);
+	draw_branch(control, "branch_yg", control_panel.branch_yg_dir);
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
@@ -551,9 +551,12 @@ function draw_tile(x,y){
 		case "bitadd":
 			draw_bitadd(ctx, stage[x][y].col);
 			break;
-		case "branch":
-			draw_branch(ctx);
+		case "branch_rb":
+			draw_branch(ctx, stage[x][y].type, stage[x][y].dir);
 			break;
+		case "branch_yg":
+			draw_branch(ctx, stage[x][y].type, stage[x][y].dir);
+			break;		
 		case "bus":
 			draw_bus(ctx, stage[x][y].dir);
 			break;
@@ -696,10 +699,37 @@ function draw_bus(canvas, dir){
 }
 
 /* tiles branch movement of each bit */
-function draw_branch(canvas){
+function draw_branch(canvas, type, dir){
+	var color_1, color_2;
+	if(type == "branch_rb"){
+		color_1 = RED;
+		color_2 = BLUE;
+	} else if(type == "branch_yg"){
+		color_1 = YELLOW;
+		color_2 = GREEN;
+	} else {
+		alert("Incorrect color sent to draw_branch().");
+	}
+
+	canvas.save();
+	switch(dir){
+		case 2:
+			canvas.translate(grid_size,0);
+			canvas.rotate(PI/2);
+			break;
+		case 3:
+			canvas.translate(grid_size,grid_size);
+			canvas.rotate(PI);
+			break;
+		case 4:
+			canvas.translate(0,grid_size);
+			canvas.rotate(-PI/2);
+			break;
+	};
+
 	/* left */
 	canvas.lineWidth = 1;
-	canvas.fillStyle = "#f00";
+	canvas.fillStyle = color_1;
 	canvas.beginPath(); 
 	canvas.moveTo(0,0);
 	canvas.lineTo(grid_size/2,grid_size/2);
@@ -717,7 +747,7 @@ function draw_branch(canvas){
 	canvas.fill();
 
 	 /* right */
-	canvas.fillStyle = "#00f";
+	canvas.fillStyle = color_2;
 	canvas.beginPath(); 
 	canvas.moveTo(grid_size,0);
 	canvas.lineTo(grid_size/2,grid_size/2);
@@ -733,6 +763,8 @@ function draw_branch(canvas){
 	canvas.lineTo(grid_size,grid_size);
 	canvas.closePath();
 	canvas.fill();
+	
+	canvas.restore();
 }
 
 function draw_bitadd(canvas, color){
