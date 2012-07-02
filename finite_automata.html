@@ -446,22 +446,22 @@ function draw_control(){
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_rb_dir == 4) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(-grid_size, 0); /* left */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_rb_dir == 2) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(0, grid_size); /* bottom */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_rb_dir == 1) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(0, -grid_size); /* top */
-	draw_bit(control, BLACK);
+	if(control_panel.branch_rb_dir == 3) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 	
 	/* branch icon green and yellow */
@@ -472,22 +472,22 @@ function draw_control(){
 
 	control.save();
 	control.translate(grid_size, 0); /* right */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_yg_dir == 4) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(-grid_size, 0); /* left */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_yg_dir == 2) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(0, grid_size); /* bottom */
-	draw_bit(control, GRAY);
+	if(control_panel.branch_yg_dir == 1) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 
 	control.save();
 	control.translate(0, -grid_size); /* top */
-	draw_bit(control, BLACK);
+	if(control_panel.branch_yg_dir == 3) { draw_bit(control, BLACK); } else { draw_bit(control, GRAY); }
 	control.restore();
 	
 	/* bit add */
@@ -653,7 +653,7 @@ function draw_output(canvas){
 /* a bus moves bits from one location to another */
 function draw_bus(canvas, dir){
 	var i = 0;
-
+	clear_square(canvas);
 	canvas.fillStyle = "#fff";
 	canvas.fillRect(2,2,grid_size-2,grid_size-2); /* clear grid */
 
@@ -769,6 +769,7 @@ function draw_branch(canvas, type, dir){
 
 function draw_bitadd(canvas, color){
 	var i = 0;
+	clear_square(canvas);
 	while(i < 2){
 		if(i==1){
 			canvas.strokeStyle = color;
@@ -809,7 +810,36 @@ function clear_square(canvas){
 }
 
 /* canvas has been clicked find out which grid and make correct change to square if needed. */
-function cnvs_clicked(e){}
+function cnvs_clicked(e){
+	var coords = cnvs_get_coordinates(canvas, e);
+	var x_pos = Math.floor(coords[0] / grid_size);
+	var y_pos = Math.floor(coords[1] / grid_size);
+	if(stage[x_pos][y_pos].type == "input" || stage[x_pos][y_pos].type == "output") { return; }
+
+	switch(control_panel.selected){
+		case "bitadd":
+			stage[x_pos][y_pos].type = "bitadd";
+			stage[x_pos][y_pos].dir = 1;
+			stage[x_pos][y_pos].col = control_panel.bitadd_col;
+			break;
+		case "branch_rb":
+			stage[x_pos][y_pos].type = "branch_rb";
+			stage[x_pos][y_pos].dir = control_panel.branch_rb_dir;
+			break;
+		case "branch_yg":
+			stage[x_pos][y_pos].type = "branch_yg";
+			stage[x_pos][y_pos].dir = control_panel.branch_yg_dir;			
+			break;
+		case "bus":
+			stage[x_pos][y_pos].type = "bus";
+			stage[x_pos][y_pos].dir = control_panel.bus_dir;
+			break;
+		case "delete":
+			stage[x_pos][y_pos].type = "";
+			break;
+	};
+	draw_tile(x_pos,y_pos);
+}
 
 </script>
 
